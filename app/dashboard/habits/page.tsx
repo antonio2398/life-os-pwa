@@ -1,4 +1,5 @@
 ﻿"use client";
+
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
@@ -47,7 +48,7 @@ interface Habit {
   title: string;
   description: string;
   frequency: string;
-  target_per_week: number;
+  weekly_target: number;
   color: string;
   is_active: boolean;
   current_streak: number;
@@ -59,7 +60,7 @@ const EMPTY_HABIT: Omit<Habit, "id"> = {
   title: "",
   description: "",
   frequency: "daily",
-  target_per_week: 7,
+  weekly_target: 7,
   color: "#7c3aed",
   is_active: true,
   current_streak: 0,
@@ -68,7 +69,7 @@ const EMPTY_HABIT: Omit<Habit, "id"> = {
 
 export default function HabitsPage() {
   const [habits, setHabits] = useState<Habit[]>([]);
-  const [logs, setLogs] = useState<Record<string, Set<string>>>({});
+  const [logs, setLogs] = useState<Record<string, string[]>>({});
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [habitForm, setHabitForm] = useState<Omit<Habit, "id">>(EMPTY_HABIT);
@@ -89,13 +90,15 @@ export default function HabitsPage() {
     if (!user) return;
     const [{ data: h }, { data: l }] = await Promise.all([
       supabase.from("habits").select("*").eq("user_id", user.id).order("created_at", { ascending: true }),
-      supabase.from("habit_logs").select("habit_id, logged_date, completed").eq("user_id", user.id).in("logged_date", weekDates),
+      supabase.from("habit_logs").select("habit_id, log_date, is_completed").eq("user_id", user.id).in("log_date", weekDates),
     ]);
     setHabits(h ?? []);
-    const logMap: Record<string, Set<string>> = {};
-    (l ?? []).filter((log: any) => log.completed).forEach((log: any) => {
-      if (!logMap[log.habit_id]) logMap[log.habit_id] = new Set();
-      logMap[log.habit_id].add(log.logged_date);
+    const logMap: Record<string, string[]> = {};
+    (l ?? []).forEach((log: { habit_id: string; log_date: string; is_completed: boolean }) => {
+      if (log.is_completed) {
+        if (!logMap[log.habit_id]) logMap[log.habit_id] = [];
+        logMap[log.habit_id].push(log.log_date);
+      }
     });
     setLogs(logMap);
     setLoading(false);
@@ -105,20 +108,14 @@ export default function HabitsPage() {
     setToggling(`${habitId}-${date}`);
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
-    const done = logs[habitId]?.has(date);
-    if (done) {
-      await supabase.from("habit_logs").delete().eq("habit_id", habitId).eq("logged_date", date).eq("user_id", user.id);
-      setLogs(prev => {
-        const next = { ...prev };
-       const currentSet = prev[habitId] || new Set();
-        const newSet = new Set(currentSet);
-        newSet.delete(date);
-        next[habitId] = newSet;
-                return next;
-      });
+    const completedDates = logs[habitId] || [];
+    const alreadyDone = completedDates.includes(date);
+    if (alreadyDone) {
+      await supabase.from("habit_logs").delete().eq("habit_id", habitId).eq("log_date", date).eq("user_id", user.id);
+      setLogs(prev => ({ ...prev, [habitId]: prev[habitId].filter(d => d !== date) }));
     } else {
-      await supabase.from("habit_logs").upsert({ habit_id: habitId, user_id: user.id, logged_date: date, completed: true });
-      setLogs(prev => ({ ...prev, [habitId]: new Set([...(prev[habitId] ?? []), date]) }));
+      await supabase.from("habit_logs").upsert({ habit_id: habitId, user_id: user.id, log_date: date, is_completed: true });
+      setLogs(prev => ({ ...prev, [habitId]: [...(prev[habitId] || []), date] }));
     }
     setToggling(null);
   }
@@ -141,7 +138,17 @@ export default function HabitsPage() {
   }
 
   function openEditHabit(habit: Habit) {
-    setHabitForm({ life_area_id: habit.life_area_id, title: habit.title, description: habit.description, frequency: habit.frequency, target_per_week: habit.target_per_week, color: habit.color, is_active: habit.is_active, current_streak: habit.current_streak, best_streak: habit.best_streak });
+    setHabitForm({
+      life_area_id: habit.life_area_id,
+      title: habit.title,
+      description: habit.description,
+      frequency: habit.frequency,
+      weekly_target: habit.weekly_target,
+      color: habit.color,
+      is_active: habit.is_active,
+      current_streak: habit.current_streak,
+      best_streak: habit.best_streak,
+    });
     setEditingId(habit.id);
     setShowForm(true);
   }
@@ -158,21 +165,25 @@ export default function HabitsPage() {
   }
 
   function weekCompletion(habitId: string, target: number): number {
-    const done = (logs[habitId]?.size ?? 0);
+    const done = logs[habitId]?.length ?? 0;
     return Math.min(Math.round((done / target) * 100), 100);
   }
 
   function todayDone(habitId: string): boolean {
-    return logs[habitId]?.has(today) ?? false;
+    return logs[habitId]?.includes(today) ?? false;
   }
 
   const visibleHabits = habits.filter(h => showInactive ? true : h.is_active);
   const activeHabits = habits.filter(h => h.is_active);
   const todayCompleted = activeHabits.filter(h => todayDone(h.id)).length;
-  const weekTotal = activeHabits.reduce((acc, h) => acc + weekCompletion(h.id, h.target_per_week), 0);
+  const weekTotal = activeHabits.reduce((acc, h) => acc + weekCompletion(h.id, h.weekly_target), 0);
   const weekAvg = activeHabits.length > 0 ? Math.round(weekTotal / activeHabits.length) : 0;
 
-  if (loading) return <div className="flex items-center justify-center h-64"><div className="text-slate-400">Cargando hábitos...</div></div>;
+  if (loading) return (
+    <div className="flex items-center justify-center h-64">
+      <div className="text-slate-400">Cargando hábitos...</div>
+    </div>
+  );
 
   return (
     <div className="space-y-6">
@@ -193,10 +204,10 @@ export default function HabitsPage() {
       {/* KPIs */}
       <div className="grid grid-cols-4 gap-3">
         {[
-          { label: "Hábitos activos",     value: activeHabits.length, color: "text-violet-400" },
-          { label: "Completados hoy",     value: `${todayCompleted}/${activeHabits.length}`, color: "text-blue-400" },
-          { label: "Promedio semanal",    value: `${weekAvg}%`, color: weekAvg >= 80 ? "text-green-400" : weekAvg >= 50 ? "text-yellow-400" : "text-red-400" },
-          { label: "Mejor racha activa",  value: activeHabits.length > 0 ? Math.max(...activeHabits.map(h => h.current_streak)) + "d" : "0d", color: "text-orange-400" },
+          { label: "Hábitos activos",    value: activeHabits.length, color: "text-violet-400" },
+          { label: "Completados hoy",    value: `${todayCompleted}/${activeHabits.length}`, color: "text-blue-400" },
+          { label: "Promedio semanal",   value: `${weekAvg}%`, color: weekAvg >= 80 ? "text-green-400" : weekAvg >= 50 ? "text-yellow-400" : "text-red-400" },
+          { label: "Mejor racha activa", value: activeHabits.length > 0 ? Math.max(...activeHabits.map(h => h.current_streak)) + "d" : "0d", color: "text-orange-400" },
         ].map(kpi => (
           <div key={kpi.label} className="bg-slate-900 border border-slate-800 rounded-xl p-4 text-center">
             <div className={`text-3xl font-black ${kpi.color}`}>{kpi.value}</div>
@@ -205,7 +216,7 @@ export default function HabitsPage() {
         ))}
       </div>
 
-      {/* Today's checklist */}
+      {/* Today checklist */}
       {activeHabits.length > 0 && (
         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
           <h3 className="text-sm font-semibold text-white mb-4">✅ Check de hoy — {today}</h3>
@@ -265,7 +276,11 @@ export default function HabitsPage() {
             </select>
             <select
               value={habitForm.frequency}
-              onChange={e => setHabitForm(p => ({ ...p, frequency: e.target.value, target_per_week: e.target.value === "daily" ? 7 : e.target.value === "weekly" ? 1 : 4 }))}
+              onChange={e => setHabitForm(p => ({
+                ...p,
+                frequency: e.target.value,
+                weekly_target: e.target.value === "daily" ? 7 : 1,
+              }))}
               className="bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-violet-500 text-sm"
             >
               <option value="daily">Diario</option>
@@ -275,14 +290,12 @@ export default function HabitsPage() {
               <label className="text-slate-400 text-xs shrink-0">Meta/sem:</label>
               <input
                 type="number" min={1} max={7}
-                value={habitForm.target_per_week}
-                onChange={e => setHabitForm(p => ({ ...p, target_per_week: Number(e.target.value) }))}
+                value={habitForm.weekly_target}
+                onChange={e => setHabitForm(p => ({ ...p, weekly_target: Number(e.target.value) }))}
                 className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2.5 text-white focus:outline-none focus:border-violet-500 text-sm"
               />
             </div>
           </div>
-
-          {/* Color picker */}
           <div>
             <label className="text-xs text-slate-400 block mb-2">Color</label>
             <div className="flex gap-2 flex-wrap">
@@ -299,28 +312,34 @@ export default function HabitsPage() {
           </div>
 
           <div className="flex gap-2">
-            <button onClick={saveHabit} disabled={saving} className="bg-violet-600 hover:bg-violet-700 text-white text-sm px-5 py-2 rounded-lg font-medium disabled:opacity-50">{saving ? "Guardando..." : "Guardar"}</button>
-            <button onClick={() => { setShowForm(false); setEditingId(null); }} className="text-slate-400 hover:text-white text-sm px-4 py-2 rounded-lg border border-slate-700">Cancelar</button>
+            <button onClick={saveHabit} disabled={saving} className="bg-violet-600 hover:bg-violet-700 text-white text-sm px-5 py-2 rounded-lg font-medium disabled:opacity-50">
+              {saving ? "Guardando..." : "Guardar"}
+            </button>
+            <button onClick={() => { setShowForm(false); setEditingId(null); }} className="text-slate-400 hover:text-white text-sm px-4 py-2 rounded-lg border border-slate-700">
+              Cancelar
+            </button>
           </div>
         </div>
       )}
 
-      {/* View toggle + Show inactive */}
+      {/* View toggle */}
       <div className="flex items-center gap-3">
         <div className="flex gap-1 bg-slate-900 border border-slate-800 rounded-lg p-1">
           {(["week", "list"] as const).map(v => (
-            <button key={v} onClick={() => setActiveView(v)} className={`px-3 py-1 text-xs rounded-md transition-colors ${activeView === v ? "bg-violet-600 text-white" : "text-slate-400 hover:text-white"}`}>
+            <button key={v} onClick={() => setActiveView(v)}
+              className={`px-3 py-1 text-xs rounded-md transition-colors ${activeView === v ? "bg-violet-600 text-white" : "text-slate-400 hover:text-white"}`}>
               {v === "week" ? "📅 Semana" : "📋 Lista"}
             </button>
           ))}
         </div>
-        <button onClick={() => setShowInactive(!showInactive)} className={`text-xs px-3 py-1 rounded-lg border transition-colors ${showInactive ? "border-violet-500 text-violet-400" : "border-slate-700 text-slate-500 hover:text-slate-300"}`}>
+        <button onClick={() => setShowInactive(!showInactive)}
+          className={`text-xs px-3 py-1 rounded-lg border transition-colors ${showInactive ? "border-violet-500 text-violet-400" : "border-slate-700 text-slate-500 hover:text-slate-300"}`}>
           {showInactive ? "Ocultar inactivos" : "Mostrar inactivos"}
         </button>
         <span className="text-xs text-slate-600 ml-auto">{visibleHabits.length} hábito{visibleHabits.length !== 1 ? "s" : ""}</span>
       </div>
 
-      {/* ── WEEKLY TABLE ─────────────────────────────────── */}
+      {/* WEEKLY TABLE */}
       {activeView === "week" && (
         <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden">
           {visibleHabits.length === 0 ? (
@@ -346,8 +365,8 @@ export default function HabitsPage() {
                 </thead>
                 <tbody>
                   {visibleHabits.map(habit => {
-                    const habitLogs = logs[habit.id] ?? new Set<string>();
-                    const weekPct = weekCompletion(habit.id, habit.target_per_week);
+                    const habitLogs = logs[habit.id] ?? [];
+                    const weekPct = weekCompletion(habit.id, habit.weekly_target);
                     return (
                       <tr key={habit.id} className={`border-b border-slate-800 last:border-0 ${!habit.is_active ? "opacity-40" : ""}`}>
                         <td className="px-4 py-3">
@@ -360,7 +379,7 @@ export default function HabitsPage() {
                           </div>
                         </td>
                         {weekDates.map(date => {
-                          const done = habitLogs.has(date);
+                          const done = habitLogs.includes(date);
                           const isT = date === today;
                           const isToggling = toggling === `${habit.id}-${date}`;
                           const isFuture = date > today;
@@ -369,12 +388,12 @@ export default function HabitsPage() {
                               <button
                                 onClick={() => !isFuture && habit.is_active && toggleLog(habit.id, date)}
                                 disabled={isFuture || !habit.is_active || isToggling}
-                                className={`w-8 h-8 rounded-lg transition-all mx-auto flex items-center justify-center text-sm
-                                  ${isFuture ? "opacity-20 cursor-not-allowed bg-slate-800" : ""}
-                                  ${!isFuture && !done ? `${isT ? "bg-slate-700 ring-1" : "bg-slate-800"} hover:bg-slate-700 text-slate-600` : ""}
-                                  ${done ? "text-white shadow-md" : ""}
-                                `}
-                                style={done ? { backgroundColor: habit.color } : isT && !isFuture ? { ringColor: habit.color } : {}}
+                                className={`w-8 h-8 rounded-lg transition-all mx-auto flex items-center justify-center text-sm ${
+                                  isFuture ? "opacity-20 cursor-not-allowed bg-slate-800" :
+                                  !done ? `${isT ? "bg-slate-700" : "bg-slate-800"} hover:bg-slate-700 text-slate-600` :
+                                  "text-white shadow-md"
+                                }`}
+                                style={done ? { backgroundColor: habit.color } : {}}
                               >
                                 {done ? "✓" : isT ? "·" : ""}
                               </button>
@@ -390,7 +409,7 @@ export default function HabitsPage() {
                         </td>
                         <td className="px-4 py-3 text-center">
                           <div className={`text-sm font-bold ${weekPct >= 100 ? "text-green-400" : weekPct >= 70 ? "text-yellow-400" : "text-red-400"}`}>{weekPct}%</div>
-                          <div className="text-xs text-slate-600">{habitLogs.size}/{habit.target_per_week}</div>
+                          <div className="text-xs text-slate-600">{habitLogs.length}/{habit.weekly_target}</div>
                         </td>
                       </tr>
                     );
@@ -402,7 +421,7 @@ export default function HabitsPage() {
         </div>
       )}
 
-      {/* ── LIST VIEW ────────────────────────────────────── */}
+      {/* LIST VIEW */}
       {activeView === "list" && (
         <div className="space-y-3">
           {visibleHabits.length === 0 ? (
@@ -412,7 +431,7 @@ export default function HabitsPage() {
             </div>
           ) : (
             visibleHabits.map(habit => {
-              const weekPct = weekCompletion(habit.id, habit.target_per_week);
+              const weekPct = weekCompletion(habit.id, habit.weekly_target);
               const area = LIFE_AREAS.find(a => a.id === habit.life_area_id);
               return (
                 <div key={habit.id} className={`bg-slate-900 border border-slate-800 rounded-2xl p-5 ${!habit.is_active ? "opacity-50" : ""}`}>
@@ -421,7 +440,7 @@ export default function HabitsPage() {
                       <div className="w-3 h-3 rounded-full mt-1.5 shrink-0" style={{ backgroundColor: habit.color }} />
                       <div className="flex-1">
                         <div className="font-semibold text-white">{habit.title}</div>
-                        <div className="text-xs text-slate-500 mt-0.5">{area?.name} · {habit.frequency === "daily" ? "Diario" : "Semanal"} · Meta: {habit.target_per_week}x/sem</div>
+                        <div className="text-xs text-slate-500 mt-0.5">{area?.name} · {habit.frequency === "daily" ? "Diario" : "Semanal"} · Meta: {habit.weekly_target}x/sem</div>
                         {habit.description && <div className="text-sm text-slate-400 mt-1">{habit.description}</div>}
                       </div>
                     </div>
@@ -451,10 +470,9 @@ export default function HabitsPage() {
                     </div>
                   </div>
 
-                  {/* Mini week calendar */}
                   <div className="mt-4 flex gap-1.5 justify-center">
                     {weekDates.map((date, i) => {
-                      const done = logs[habit.id]?.has(date);
+                      const done = logs[habit.id]?.includes(date) ?? false;
                       const isFuture = date > today;
                       return (
                         <div key={date} className="text-center">
@@ -462,7 +480,10 @@ export default function HabitsPage() {
                           <button
                             onClick={() => !isFuture && habit.is_active && toggleLog(habit.id, date)}
                             disabled={isFuture || !habit.is_active}
-                            className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs transition-all ${isFuture ? "opacity-20 cursor-not-allowed bg-slate-800" : done ? "text-white" : "bg-slate-800 hover:bg-slate-700 text-slate-600"}`}
+                            className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs transition-all ${
+                              isFuture ? "opacity-20 cursor-not-allowed bg-slate-800" :
+                              done ? "text-white" : "bg-slate-800 hover:bg-slate-700 text-slate-600"
+                            }`}
                             style={done ? { backgroundColor: habit.color } : {}}
                           >
                             {done ? "✓" : ""}

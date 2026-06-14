@@ -110,8 +110,11 @@ export default function HabitsPage() {
       await supabase.from("habit_logs").delete().eq("habit_id", habitId).eq("logged_date", date).eq("user_id", user.id);
       setLogs(prev => {
         const next = { ...prev };
-        next[habitId] = new Set([...(prev[habitId] ?? [])].filter(d => d !== date));
-        return next;
+       const currentSet = prev[habitId] || new Set();
+        const newSet = new Set(currentSet);
+        newSet.delete(date);
+        next[habitId] = newSet;
+                return next;
       });
     } else {
       await supabase.from("habit_logs").upsert({ habit_id: habitId, user_id: user.id, logged_date: date, completed: true });

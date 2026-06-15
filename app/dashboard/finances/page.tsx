@@ -607,61 +607,95 @@ export default function FinancesPage() {
         </div>
       )}
 
-      {/* ── BUDGET ───────────────────────────────────────────────────────────*/}
+      {/* ── BUDGET — automático basado en balance ─────────────────────────────*/}
       {activeTab === "budget" && (
         <div className="space-y-4">
-          <div className="flex justify-end">
-            <button onClick={() => setShowBudgetForm(true)} className="bg-violet-600 hover:bg-violet-700 text-white text-sm px-4 py-2 rounded-lg">+ Nuevo Presupuesto</button>
-          </div>
-          {showBudgetForm && (
-            <div className="bg-slate-900 border border-violet-500/40 rounded-2xl p-5 space-y-4">
-              <div className="text-sm font-semibold text-white">Presupuesto para {selectedMonth}</div>
-              <div className="grid grid-cols-2 gap-3">
-                <select value={budgetForm.category} onChange={e => setBudgetForm(p => ({ ...p, category: e.target.value }))}
-                  className="bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-violet-500 text-sm">
-                  {EXPENSE_CATEGORIES.map(c => <option key={c.name} value={c.name}>{c.icon} {c.name}</option>)}
-                </select>
-                <input type="number" value={budgetForm.monthly_limit} onChange={e => setBudgetForm(p => ({ ...p, monthly_limit: e.target.value }))}
-                  placeholder="Límite mensual $" className="bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-violet-500 text-sm" />
+
+          {/* Balance hero */}
+          <div className={`rounded-2xl p-5 border ${balance >= 0 ? "bg-green-950/20 border-green-500/30" : "bg-red-950/20 border-red-500/30"}`}>
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-xs text-slate-400 uppercase tracking-widest mb-1">Balance del mes · {selectedMonth}</div>
+                <div className={`text-4xl font-black tabular-nums ${balance >= 0 ? "text-green-400" : "text-red-400"}`}>
+                  {balance >= 0 ? "+" : "-"}${Math.abs(balance).toLocaleString("es-CO", { minimumFractionDigits: 2 })}
+                </div>
+                <div className="text-xs text-slate-500 mt-1">
+                  Ingresos ${totalIncome.toLocaleString()} − Egresos ${totalExpense.toLocaleString()}
+                </div>
               </div>
-              <div className="flex gap-2">
-                <button onClick={saveBudget} disabled={savingBudget} className="bg-violet-600 hover:bg-violet-700 disabled:opacity-50 text-white text-sm px-5 py-2 rounded-lg font-medium">{savingBudget ? "Guardando..." : "Guardar"}</button>
-                <button onClick={() => setShowBudgetForm(false)} className="text-slate-400 hover:text-white text-sm px-4 py-2 rounded-lg border border-slate-700">Cancelar</button>
+              <div className="text-5xl">{balance >= 0 ? "✅" : "⚠️"}</div>
+            </div>
+          </div>
+
+          {/* Distribución de egresos vs balance */}
+          {expenses.length === 0 ? (
+            <div className="text-center py-10 text-slate-600">Sin egresos este mes para analizar</div>
+          ) : (
+            <div className="space-y-3">
+              <div className="text-sm font-semibold text-white">Distribución de egresos</div>
+              <p className="text-xs text-slate-500">Cada categoría muestra qué % representa del total de ingresos.</p>
+
+              {EXPENSE_CATEGORIES.map(cat => {
+                const spent = expenses
+                  .filter(e => e.category === cat.name)
+                  .reduce((s, e) => s + Number(e.amount), 0);
+                if (spent === 0) return null;
+
+                // % del total de ingresos
+                const pctOfIncome = totalIncome > 0 ? Math.round((spent / totalIncome) * 100) : 0;
+                // % del total de egresos (distribución interna)
+                const pctOfExpense = totalExpense > 0 ? Math.round((spent / totalExpense) * 100) : 0;
+
+                const statusColor =
+                  pctOfIncome >= 40 ? "text-red-400 border-red-500/30 bg-red-900/20" :
+                  pctOfIncome >= 20 ? "text-yellow-400 border-yellow-500/30 bg-yellow-900/20" :
+                  "text-green-400 border-green-500/30 bg-green-900/20";
+
+                const barW = pctOfExpense;
+
+                return (
+                  <div key={cat.name} className="bg-slate-900 border border-slate-800 rounded-xl p-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <span>{cat.icon}</span>
+                        <span className="text-sm text-white font-medium">{cat.name}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-white tabular-nums">${spent.toLocaleString()}</span>
+                        <span className={`text-xs px-2 py-0.5 rounded-full border font-medium ${statusColor}`}>
+                          {pctOfIncome}% ingresos
+                        </span>
+                      </div>
+                    </div>
+                    <div className="h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                      <div
+                        className={`h-full rounded-full ${pctOfIncome >= 40 ? "bg-red-500" : pctOfIncome >= 20 ? "bg-yellow-500" : "bg-green-500"}`}
+                        style={{ width: `${Math.min(barW, 100)}%` }}
+                      />
+                    </div>
+                    <div className="text-xs text-slate-600 mt-1">{pctOfExpense}% del total de egresos</div>
+                  </div>
+                );
+              }).filter(Boolean)}
+
+              {/* Resumen final */}
+              <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-3">
+                <div className="text-sm font-semibold text-white">Resumen del mes</div>
+                <div className="grid grid-cols-2 gap-3">
+                  {[
+                    { label: "Ingresos totales",  value: `$${totalIncome.toLocaleString()}`,  color: "text-green-400" },
+                    { label: "Egresos totales",   value: `$${totalExpense.toLocaleString()}`, color: "text-red-400" },
+                    { label: "Balance neto",       value: `${balance >= 0 ? "+" : "-"}$${Math.abs(balance).toLocaleString()}`, color: balance >= 0 ? "text-blue-400" : "text-red-400" },
+                    { label: "Tasa de ahorro",     value: `${savingsRate}%`, color: savingsRate >= 20 ? "text-green-400" : savingsRate >= 10 ? "text-yellow-400" : "text-red-400" },
+                  ].map(item => (
+                    <div key={item.label} className="bg-slate-800/50 rounded-xl p-3">
+                      <div className="text-xs text-slate-500 mb-1">{item.label}</div>
+                      <div className={`text-lg font-black tabular-nums ${item.color}`}>{item.value}</div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
-          )}
-          {budgets.length === 0 ? (
-            <div className="text-center py-10 text-slate-600">Sin presupuestos definidos</div>
-          ) : (
-            budgets.map(budget => {
-              const cat   = EXPENSE_CATEGORIES.find(c => c.name === budget.category);
-              const spent = expenses.filter(e => e.category === budget.category).reduce((s, e) => s + Number(e.amount), 0);
-              const pct   = budget.monthly_limit > 0 ? Math.round((spent / budget.monthly_limit) * 100) : 0;
-              return (
-                <div key={budget.id} className={`bg-slate-900 border rounded-2xl p-5 ${pct >= 100 ? "border-red-500/30" : pct >= 80 ? "border-yellow-500/30" : "border-slate-800"}`}>
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-2">
-                      <span className="text-lg">{cat?.icon}</span>
-                      <span className="font-medium text-white">{budget.category}</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className={`text-xs px-2 py-0.5 rounded-full border font-medium ${alertColor(pct)}`}>
-                        {pct}%{pct >= 100 ? " DÉFICIT" : pct >= 80 ? " Alerta" : " OK"}
-                      </span>
-                      <button onClick={() => deleteBudget(budget.id)} className="text-slate-600 hover:text-red-400 text-xs">✕</button>
-                    </div>
-                  </div>
-                  <div className="h-2 bg-slate-800 rounded-full overflow-hidden mb-2">
-                    <div className={`h-full rounded-full ${barColor(pct)}`} style={{ width: `${Math.min(pct, 100)}%` }} />
-                  </div>
-                  <div className="grid grid-cols-3 text-center text-xs">
-                    <div><div className="text-white font-medium">${budget.monthly_limit.toLocaleString()}</div><div className="text-slate-600">Presupuesto</div></div>
-                    <div><div className="text-red-400 font-medium">${spent.toLocaleString()}</div><div className="text-slate-600">Gastado</div></div>
-                    <div><div className={`font-medium ${spent <= budget.monthly_limit ? "text-green-400" : "text-red-400"}`}>${Math.max(budget.monthly_limit - spent, 0).toLocaleString()}</div><div className="text-slate-600">Disponible</div></div>
-                  </div>
-                </div>
-              );
-            })
           )}
         </div>
       )}

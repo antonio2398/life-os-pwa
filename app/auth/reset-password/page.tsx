@@ -10,14 +10,27 @@ export default function ResetPasswordPage() {
   const [done,      setDone]      = useState(false);
   const [error,     setError]     = useState<string | null>(null);
   const [ready,     setReady]     = useState(false);
-  const router  = useRouter();
+  const router   = useRouter();
   const supabase = createClient();
 
   useEffect(() => {
-    // Supabase sets the session from the URL hash automatically
-    supabase.auth.onAuthStateChange((event) => {
-      if (event === "PASSWORD_RECOVERY") setReady(true);
+    // Supabase embeds the token in the URL hash — we need to let it process
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "PASSWORD_RECOVERY" && session) {
+        setReady(true);
+      }
+      // If user is already logged in via the recovery link
+      if (event === "SIGNED_IN" && session) {
+        setReady(true);
+      }
     });
+
+    // Also check if there's already a session (token already consumed)
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) setReady(true);
+    });
+
+    return () => subscription.unsubscribe();
   }, [supabase]);
 
   async function handleReset() {
@@ -32,19 +45,20 @@ export default function ResetPasswordPage() {
     setLoading(true);
     setError(null);
     const { error } = await supabase.auth.updateUser({ password });
-    if (error) setError(error.message);
-    else {
+    if (error) {
+      setError(error.message);
+      setLoading(false);
+    } else {
       setDone(true);
-      setTimeout(() => router.push("/dashboard"), 2000);
+      setTimeout(() => router.push("/dashboard"), 2500);
     }
-    setLoading(false);
   }
 
   if (!ready) return (
     <div className="min-h-screen bg-slate-950 flex items-center justify-center">
       <div className="text-center">
         <div className="w-8 h-8 border-2 border-violet-500/30 border-t-violet-500 rounded-full animate-spin mx-auto mb-4" />
-        <div className="text-slate-400 text-sm">Verificando enlace...</div>
+        <div className="text-slate-400 text-sm">Verificando enlace de recuperación...</div>
       </div>
     </div>
   );
@@ -55,7 +69,7 @@ export default function ResetPasswordPage() {
         <div className="text-center mb-8">
           <div className="text-4xl mb-3">🔒</div>
           <h1 className="text-2xl font-bold text-white">Nueva contraseña</h1>
-          <p className="text-slate-400 text-sm mt-2">Elige una contraseña segura.</p>
+          <p className="text-slate-400 text-sm mt-2">Elige una contraseña segura para tu cuenta.</p>
         </div>
 
         {done ? (

@@ -1,6 +1,7 @@
 ﻿"use client";
 import { useEffect, useState, useRef, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
+import MonthCloseCard from "@/components/finances/MonthCloseCard";
 
 const CURRENCIES = [
   { code: "USD", flag: "🇺🇸", name: "Dólar USD" },
@@ -353,6 +354,8 @@ export default function FinancesPage() {
           <div className="text-2xl font-black text-slate-300">{incomes.length + expenses.length}</div>
         </div>
       </div>
+
+      <MonthCloseCard month={selectedMonth} totalIncome={totalIncome} totalExpense={totalExpense} />
 
       {/* TABS */}
       <div className="flex gap-1 bg-slate-900 border border-slate-800 rounded-xl p-1 overflow-x-auto">

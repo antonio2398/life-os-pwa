@@ -24,7 +24,7 @@ const EXPENSE_CATEGORIES = [
   { name: "Servicios", icon: "⚡" }, { name: "Salud", icon: "💊" },
   { name: "Educación", icon: "📚" }, { name: "Ropa", icon: "👕" },
   { name: "Networking", icon: "🤝" }, { name: "Inversión", icon: "📈" },
-  { name: "Deuda", icon: "💳" }, { name: "Suscripciones", icon: "📱" },
+  { name: "Deuda", icon: "💳" }, { name: "Viajes", icon: "✈️" }, { name: "Suscripciones", icon: "📱" },
   { name: "Donaciones", icon: "❤️" }, { name: "Otro", icon: "➕" },
 ];
 

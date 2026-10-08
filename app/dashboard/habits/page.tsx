@@ -42,6 +42,16 @@ function getTodayString(): string {
   return new Date().toISOString().split("T")[0];
 }
 
+const FREQUENCY_LABELS: Record<string, { label: string; period: string; max: number; defaultTarget: number }> = {
+  daily:   { label: "Diario",  period: "sem", max: 7,  defaultTarget: 7 },
+  weekly:  { label: "Semanal", period: "sem", max: 7,  defaultTarget: 1 },
+  monthly: { label: "Mensual", period: "mes", max: 31, defaultTarget: 1 },
+};
+
+function freqInfo(frequency: string) {
+  return FREQUENCY_LABELS[frequency] ?? FREQUENCY_LABELS.daily;
+}
+
 interface Habit {
   id: string;
   life_area_id: number;
@@ -80,6 +90,9 @@ export default function HabitsPage() {
   const [showInactive, setShowInactive] = useState(false);
   const weekDates = getWeekDates();
   const today = getTodayString();
+  const currentMonth = today.slice(0, 7);
+  // Logs from the earliest of (week start, month start) so monthly habits can be measured
+  const logsFrom = [weekDates[0], `${currentMonth}-01`].sort()[0];
   const supabase = createClient();
 
   useEffect(() => { load(); }, []);
@@ -90,7 +103,7 @@ export default function HabitsPage() {
     if (!user) return;
     const [{ data: h }, { data: l }] = await Promise.all([
       supabase.from("habits").select("*").eq("user_id", user.id).order("created_at", { ascending: true }),
-      supabase.from("habit_logs").select("habit_id, logged_date, completed").eq("user_id", user.id).in("logged_date", weekDates),
+      supabase.from("habit_logs").select("habit_id, logged_date, completed").eq("user_id", user.id).gte("logged_date", logsFrom).lte("logged_date", weekDates[6]),
     ]);
     setHabits(h ?? []);
     const logMap: Record<string, string[]> = {};
@@ -164,9 +177,16 @@ export default function HabitsPage() {
     load();
   }
 
-  function weekCompletion(habitId: string, target: number): number {
-    const done = logs[habitId]?.length ?? 0;
-    return Math.min(Math.round((done / target) * 100), 100);
+  // Completions in the habit's current period: this month for monthly habits, this week otherwise
+  function periodCount(habit: Habit): number {
+    const dates = logs[habit.id] ?? [];
+    return habit.frequency === "monthly"
+      ? dates.filter(d => d.startsWith(currentMonth)).length
+      : dates.filter(d => weekDates.includes(d)).length;
+  }
+
+  function weekCompletion(habit: Habit): number {
+    return Math.min(Math.round((periodCount(habit) / Math.max(habit.target_per_week, 1)) * 100), 100);
   }
 
   function todayDone(habitId: string): boolean {
@@ -176,7 +196,7 @@ export default function HabitsPage() {
   const visibleHabits = habits.filter(h => showInactive ? true : h.is_active);
   const activeHabits = habits.filter(h => h.is_active);
   const todayCompleted = activeHabits.filter(h => todayDone(h.id)).length;
-  const weekTotal = activeHabits.reduce((acc, h) => acc + weekCompletion(h.id, h.target_per_week), 0);
+  const weekTotal = activeHabits.reduce((acc, h) => acc + weekCompletion(h), 0);
   const weekAvg = activeHabits.length > 0 ? Math.round(weekTotal / activeHabits.length) : 0;
 
   if (loading) return (
@@ -279,17 +299,16 @@ export default function HabitsPage() {
               onChange={e => setHabitForm(p => ({
                 ...p,
                 frequency: e.target.value,
-                target_per_week: e.target.value === "daily" ? 7 : 1,
+                target_per_week: freqInfo(e.target.value).defaultTarget,
               }))}
               className="bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-violet-500 text-sm"
             >
-              <option value="daily">Diario</option>
-              <option value="weekly">Semanal</option>
+              {Object.entries(FREQUENCY_LABELS).map(([value, f]) => <option key={value} value={value}>{f.label}</option>)}
             </select>
             <div className="flex items-center gap-2">
-              <label className="text-slate-400 text-xs shrink-0">Meta/sem:</label>
+              <label className="text-slate-400 text-xs shrink-0">Meta/{freqInfo(habitForm.frequency).period}:</label>
               <input
-                type="number" min={1} max={7}
+                type="number" min={1} max={freqInfo(habitForm.frequency).max}
                 value={habitForm.target_per_week}
                 onChange={e => setHabitForm(p => ({ ...p, target_per_week: Number(e.target.value) }))}
                 className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2.5 text-white focus:outline-none focus:border-violet-500 text-sm"
@@ -367,7 +386,7 @@ export default function HabitsPage() {
                 <tbody>
                   {visibleHabits.map(habit => {
                     const habitLogs = logs[habit.id] ?? [];
-                    const weekPct = weekCompletion(habit.id, habit.target_per_week);
+                    const weekPct = weekCompletion(habit);
                     return (
                       <tr key={habit.id} className={`border-b border-slate-800 last:border-0 ${!habit.is_active ? "opacity-40" : ""}`}>
                         <td className="px-4 py-3">
@@ -410,7 +429,7 @@ export default function HabitsPage() {
                         </td>
                         <td className="px-4 py-3 text-center">
                           <div className={`text-sm font-bold ${weekPct >= 100 ? "text-green-400" : weekPct >= 70 ? "text-yellow-400" : "text-red-400"}`}>{weekPct}%</div>
-                          <div className="text-xs text-slate-600">{habitLogs.length}/{habit.target_per_week}</div>
+                          <div className="text-xs text-slate-600">{periodCount(habit)}/{habit.target_per_week}{habit.frequency === "monthly" ? " mes" : ""}</div>
                         </td>
                       </tr>
                     );
@@ -432,7 +451,7 @@ export default function HabitsPage() {
             </div>
           ) : (
             visibleHabits.map(habit => {
-              const weekPct = weekCompletion(habit.id, habit.target_per_week);
+              const weekPct = weekCompletion(habit);
               const area = LIFE_AREAS.find(a => a.id === habit.life_area_id);
               return (
                 <div key={habit.id} className={`bg-slate-900 border border-slate-800 rounded-2xl p-5 ${!habit.is_active ? "opacity-50" : ""}`}>
@@ -441,7 +460,7 @@ export default function HabitsPage() {
                       <div className="w-3 h-3 rounded-full mt-1.5 shrink-0" style={{ backgroundColor: habit.color }} />
                       <div className="flex-1">
                         <div className="font-semibold text-white">{habit.title}</div>
-                        <div className="text-xs text-slate-500 mt-0.5">{area?.name} · {habit.frequency === "daily" ? "Diario" : "Semanal"} · Meta: {habit.target_per_week}x/sem</div>
+                        <div className="text-xs text-slate-500 mt-0.5">{area?.name} · {freqInfo(habit.frequency).label} · Meta: {habit.target_per_week}x/{freqInfo(habit.frequency).period}</div>
                         {habit.description && <div className="text-sm text-slate-400 mt-1">{habit.description}</div>}
                       </div>
                     </div>

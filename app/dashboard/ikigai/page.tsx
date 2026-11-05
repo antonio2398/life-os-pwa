@@ -1,6 +1,7 @@
 ﻿"use client";
 import { useEffect, useState, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { Check, Pencil, X } from "lucide-react";
 
 // ── AI-guided questions for each quadrant ─────────────────────────────────────
 // Each question asks something concrete → AI extracts the ikigai item from the answer
@@ -96,19 +97,19 @@ const GUIDED_QUESTIONS: Record<string, { question: string; example: string; foll
 };
 
 const QUADRANT_META = {
-  what_you_love:            { label: "❤️ Lo que AMAS",           color: "text-red-400",    bg: "bg-red-950/20",    border: "border-red-500/40",    desc: "Pasiones que te dan energía" },
-  what_you_are_good_at:     { label: "💪 En qué eres BUENO",     color: "text-blue-400",   bg: "bg-blue-950/20",   border: "border-blue-500/40",   desc: "Habilidades y fortalezas naturales" },
-  what_world_needs:         { label: "🌍 Lo que el MUNDO necesita",color: "text-green-400", bg: "bg-green-950/20",  border: "border-green-500/40",  desc: "Problemas que puedes resolver" },
-  what_you_can_be_paid_for: { label: "💰 Por lo que te PAGAN",   color: "text-yellow-400", bg: "bg-yellow-950/20", border: "border-yellow-500/40", desc: "Valor económico que generas" },
+  what_you_love:            { label: "Lo que AMAS",           color: "text-red-400",    bg: "bg-red-950/20",    border: "border-red-500/40",    desc: "Pasiones que te dan energía" },
+  what_you_are_good_at:     { label: "En qué eres BUENO",     color: "text-blue-400",   bg: "bg-blue-950/20",   border: "border-blue-500/40",   desc: "Habilidades y fortalezas naturales" },
+  what_world_needs:         { label: "Lo que el MUNDO necesita",color: "text-green-400", bg: "bg-green-950/20",  border: "border-green-500/40",  desc: "Problemas que puedes resolver" },
+  what_you_can_be_paid_for: { label: "Por lo que te PAGAN",   color: "text-yellow-400", bg: "bg-yellow-950/20", border: "border-yellow-500/40", desc: "Valor económico que generas" },
 } as const;
 
 type QuadrantKey = keyof typeof QUADRANT_META;
 
 const INTERSECTIONS = [
-  { label: "🔥 Pasión",    desc: "Amas + Bueno en ello",         note: "Lo disfrutas pero puede que aún no genere ingresos." },
-  { label: "🌱 Misión",    desc: "Amas + Mundo lo necesita",      note: "Te llena y tiene impacto social real." },
-  { label: "🎯 Vocación",  desc: "Mundo necesita + Te pagan",     note: "Rentable e impactante, aunque puede no apasionarte." },
-  { label: "💼 Profesión", desc: "Bueno en ello + Te pagan",      note: "Genera ingresos con tus habilidades." },
+  { label: "Pasión",    desc: "Amas + Bueno en ello",         note: "Lo disfrutas pero puede que aún no genere ingresos." },
+  { label: "Misión",    desc: "Amas + Mundo lo necesita",      note: "Te llena y tiene impacto social real." },
+  { label: "Vocación",  desc: "Mundo necesita + Te pagan",     note: "Rentable e impactante, aunque puede no apasionarte." },
+  { label: "Profesión", desc: "Bueno en ello + Te pagan",      note: "Genera ingresos con tus habilidades." },
 ];
 
 interface IkigaiData {
@@ -354,10 +355,10 @@ Responde SOLO con la declaración, sin explicaciones ni comillas extra.`;
           )}
         </div>
         <div className="flex items-center gap-2">
-          {isComplete && <span className="text-xs text-green-400 bg-green-900/30 border border-green-500/30 px-2.5 py-1 rounded-full">✓ IKIGAI completo</span>}
+          {isComplete && <span className="text-xs text-green-400 bg-green-900/30 border border-green-500/30 px-2.5 py-1 rounded-full">IKIGAI completo</span>}
           <button onClick={() => save()} disabled={saving}
             className="bg-violet-600 hover:bg-violet-700 disabled:opacity-50 text-white px-5 py-2 rounded-xl text-sm font-medium transition-colors">
-            {saving ? "Guardando..." : saved ? "✅ Guardado" : "Guardar"}
+            {saving ? "Guardando..." : saved ? "Guardado" : "Guardar"}
           </button>
         </div>
       </div>
@@ -380,9 +381,9 @@ Responde SOLO con la declaración, sin explicaciones ni comillas extra.`;
       {/* ── VIEW TOGGLE ──────────────────────────────────────────────────────*/}
       <div className="flex gap-1 bg-slate-900 border border-slate-800 rounded-xl p-1">
         {([
-          ["guided",    "🤖 Guiado con IA"],
-          ["manual",    "✏️ Edición manual"],
-          ["statement", "✦ Declaración IKIGAI"],
+          ["guided",    "Guiado con IA"],
+          ["manual",    "Edición manual"],
+          ["statement", "Declaración IKIGAI"],
         ] as [typeof activeView, string][]).map(([v, label]) => (
           <button key={v} onClick={() => setActiveView(v)}
             className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${
@@ -399,7 +400,6 @@ Responde SOLO con la declaración, sin explicaciones ni comillas extra.`;
           {/* Intro if nothing started */}
           {!guidedQuadrant && (
             <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 text-center">
-              <div className="text-4xl mb-3">🧭</div>
               <div className="text-white font-semibold text-lg mb-2">Descubre tu IKIGAI respondiendo preguntas</div>
               <p className="text-slate-400 text-sm max-w-md mx-auto mb-6">
                 En lugar de pensar en categorías abstractas, responde preguntas concretas sobre tu vida. La IA extrae los ítems automáticamente de tus respuestas.
@@ -411,7 +411,7 @@ Responde SOLO con la declaración, sin explicaciones ni comillas extra.`;
                     <div className="font-medium text-white text-sm mb-0.5">{meta.label}</div>
                     <div className="text-xs text-slate-500">{meta.desc}</div>
                     <div className={`text-xs mt-2 ${meta.color}`}>
-                      {data[key].length > 0 ? `✓ ${data[key].length} ítems` : "Sin responder"}
+                      {data[key].length > 0 ? `${data[key].length} ítems` : "Sin responder"}
                     </div>
                   </button>
                 ))}
@@ -460,7 +460,7 @@ Responde SOLO con la declaración, sin explicaciones ni comillas extra.`;
                   <div className="mb-4 space-y-1">
                     {guidedAnswers[guidedQuadrant]?.map((a, i) => (
                       <div key={i} className="text-xs text-slate-500 flex gap-2">
-                        <span className="text-slate-600 shrink-0">✓ P{i+1}:</span>
+                        <span className="text-slate-600 shrink-0">P{i+1}:</span>
                         <span className="truncate">{a.answer.slice(0, 80)}{a.answer.length > 80 ? "..." : ""}</span>
                       </div>
                     ))}
@@ -484,7 +484,7 @@ Responde SOLO con la declaración, sin explicaciones ni comillas extra.`;
                     className="bg-violet-600 hover:bg-violet-700 disabled:opacity-40 text-white px-6 py-2.5 rounded-xl text-sm font-medium transition-colors"
                   >
                     {guidedStep >= GUIDED_QUESTIONS[guidedQuadrant].length - 1 || (guidedAnswers[guidedQuadrant]?.length ?? 0) >= 1
-                      ? "🤖 Extraer ítems con IA"
+                      ? "Extraer ítems con IA"
                       : "Siguiente pregunta →"}
                   </button>
                   {(guidedAnswers[guidedQuadrant]?.length ?? 0) >= 1 && (
@@ -530,7 +530,7 @@ Responde SOLO con la declaración, sin explicaciones ni comillas extra.`;
                       className="flex-1 bg-transparent text-sm text-white focus:outline-none"
                     />
                     <button onClick={() => setExtracted(prev => prev.filter((_, idx) => idx !== i))}
-                      className="text-slate-600 hover:text-red-400 text-xs shrink-0">✕</button>
+                      className="text-slate-600 hover:text-red-400 text-xs shrink-0"><X size={14} /></button>
                   </div>
                 ))}
               </div>
@@ -540,7 +540,7 @@ Responde SOLO con la declaración, sin explicaciones ni comillas extra.`;
                   onClick={() => acceptExtracted(guidedQuadrant, extracted)}
                   className="bg-violet-600 hover:bg-violet-700 text-white px-6 py-2.5 rounded-xl text-sm font-medium transition-colors"
                 >
-                  ✅ Agregar al IKIGAI ({extracted.length} ítems)
+                  Agregar al IKIGAI ({extracted.length} ítems)
                 </button>
                 <button onClick={() => { setExtracted([]); setGuidedAnswer(""); setGuidedStep(prev => Math.min(prev+1, GUIDED_QUESTIONS[guidedQuadrant].length-1)); }}
                   className="text-slate-400 hover:text-white text-sm px-4 py-2 rounded-xl border border-slate-700 transition-colors">
@@ -606,15 +606,15 @@ Responde SOLO con la declaración, sin explicaciones ni comillas extra.`;
                           <input value={editingVal} onChange={e => setEditingVal(e.target.value)}
                             onKeyDown={e => { if (e.key==="Enter") saveEdit(key,i); if (e.key==="Escape") { setEditingKey(null); setEditingIdx(null); } }}
                             className="flex-1 bg-slate-700 border border-violet-500 rounded px-2 py-0.5 text-white text-sm focus:outline-none" autoFocus />
-                          <button onClick={() => saveEdit(key,i)} className="text-green-400 text-xs">✓</button>
-                          <button onClick={() => { setEditingKey(null); setEditingIdx(null); }} className="text-slate-400 text-xs">✕</button>
+                          <button onClick={() => saveEdit(key,i)} className="text-green-400 text-xs"><Check size={14} /></button>
+                          <button onClick={() => { setEditingKey(null); setEditingIdx(null); }} className="text-slate-400 text-xs"><X size={14} /></button>
                         </div>
                       ) : (
                         <div className="flex-1 flex items-center justify-between gap-2">
                           <span className="text-sm text-slate-200 flex-1">• {item}</span>
                           <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button onClick={() => { setEditingKey(key); setEditingIdx(i); setEditingVal(item); }} className="text-slate-500 hover:text-blue-400 text-xs">✎</button>
-                            <button onClick={() => removeItem(key,i)} className="text-slate-500 hover:text-red-400 text-xs">✕</button>
+                            <button onClick={() => { setEditingKey(key); setEditingIdx(i); setEditingVal(item); }} className="text-slate-500 hover:text-blue-400 text-xs"><Pencil size={14} /></button>
+                            <button onClick={() => removeItem(key,i)} className="text-slate-500 hover:text-red-400 text-xs"><X size={14} /></button>
                           </div>
                         </div>
                       )}
@@ -637,7 +637,7 @@ Responde SOLO con la declaración, sin explicaciones ni comillas extra.`;
 
           <button onClick={() => save()} disabled={saving}
             className="w-full bg-violet-600 hover:bg-violet-700 disabled:opacity-50 text-white py-3 rounded-xl font-medium transition-colors">
-            {saving ? "Guardando..." : saved ? "✅ Guardado" : "Guardar cambios"}
+            {saving ? "Guardando..." : saved ? "Guardado" : "Guardar cambios"}
           </button>
         </div>
       )}
@@ -662,7 +662,7 @@ Responde SOLO con la declaración, sin explicaciones ni comillas extra.`;
           <div className="bg-slate-900 border border-violet-500/30 rounded-2xl p-5">
             <div className="flex items-center justify-between mb-3">
               <div>
-                <div className="font-semibold text-white">✦ Tu declaración de propósito</div>
+                <div className="font-semibold text-white">Tu declaración de propósito</div>
                 <div className="text-xs text-slate-500 mt-0.5">Generada por IA desde tu IKIGAI, o escríbela tú mismo</div>
               </div>
               <button
@@ -673,7 +673,7 @@ Responde SOLO con la declaración, sin explicaciones ni comillas extra.`;
               >
                 {statementLoading
                   ? <><span className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Generando...</>
-                  : "🤖 Generar con IA"}
+                  : "Generar con IA"}
               </button>
             </div>
 
@@ -689,7 +689,7 @@ Responde SOLO con la declaración, sin explicaciones ni comillas extra.`;
             )}
 
             <button onClick={() => save()} disabled={saving} className="mt-3 bg-violet-600 hover:bg-violet-700 disabled:opacity-50 text-white px-5 py-2 rounded-xl text-sm font-medium transition-colors">
-              {saving ? "Guardando..." : saved ? "✅ Guardado" : "Guardar declaración"}
+              {saving ? "Guardando..." : saved ? "Guardado" : "Guardar declaración"}
             </button>
           </div>
 

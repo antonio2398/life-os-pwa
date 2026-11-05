@@ -14,7 +14,7 @@ export default function RegisterPage() {
     if (error) { setError(error.message); setLoading(false); }
     else { setSuccess(true); setTimeout(() => router.push("/auth/login"), 3000); }
   }
-  if (success) return <div className="min-h-screen flex items-center justify-center bg-slate-950"><div className="text-center space-y-4"><div className="text-5xl">âœ…</div><h2 className="text-2xl font-bold text-white">Cuenta creada</h2><p className="text-slate-400">Revisa tu correo para confirmar.</p></div></div>;
+  if (success) return <div className="min-h-screen flex items-center justify-center bg-slate-950"><div className="text-center space-y-4"><div className="text-5xl"></div><h2 className="text-2xl font-bold text-white">Cuenta creada</h2><p className="text-slate-400">Revisa tu correo para confirmar.</p></div></div>;
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-950 px-4">
       <div className="w-full max-w-md">

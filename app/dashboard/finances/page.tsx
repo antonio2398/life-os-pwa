@@ -2,31 +2,32 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
 import MonthCloseCard from "@/components/finances/MonthCloseCard";
+import { Pencil, X } from "lucide-react";
 
 const CURRENCIES = [
-  { code: "USD", flag: "🇺🇸", name: "Dólar USD" },
-  { code: "COP", flag: "🇨🇴", name: "Peso COP" },
-  { code: "EUR", flag: "🇪🇺", name: "Euro EUR" },
-  { code: "MXN", flag: "🇲🇽", name: "Peso MXN" },
-  { code: "GBP", flag: "🇬🇧", name: "Libra GBP" },
-  { code: "BRL", flag: "🇧🇷", name: "Real BRL" },
-  { code: "ARS", flag: "🇦🇷", name: "Peso ARS" },
-  { code: "CAD", flag: "🇨🇦", name: "Dólar CAD" },
-  { code: "CLP", flag: "🇨🇱", name: "Peso CLP" },
-  { code: "PEN", flag: "🇵🇪", name: "Sol PEN" },
-  { code: "BTC", flag: "₿",   name: "Bitcoin" },
-  { code: "ETH", flag: "Ξ",   name: "Ethereum" },
+  { code: "USD", name: "Dólar USD" },
+  { code: "COP", name: "Peso COP" },
+  { code: "EUR", name: "Euro EUR" },
+  { code: "MXN", name: "Peso MXN" },
+  { code: "GBP", name: "Libra GBP" },
+  { code: "BRL", name: "Real BRL" },
+  { code: "ARS", name: "Peso ARS" },
+  { code: "CAD", name: "Dólar CAD" },
+  { code: "CLP", name: "Peso CLP" },
+  { code: "PEN", name: "Sol PEN" },
+  { code: "BTC",   name: "Bitcoin" },
+  { code: "ETH",   name: "Ethereum" },
 ];
 
 const INCOME_CATEGORIES = ["Salario", "Freelance", "Inversiones", "Negocio", "Bienes raíces", "Dividendos", "Bono", "Reembolso", "Otro"];
 const EXPENSE_CATEGORIES = [
-  { name: "Vivienda", icon: "🏠" }, { name: "Alimentación", icon: "🍽️" },
-  { name: "Transporte", icon: "🚗" }, { name: "Entretenimiento", icon: "🎬" },
-  { name: "Servicios", icon: "⚡" }, { name: "Salud", icon: "💊" },
-  { name: "Educación", icon: "📚" }, { name: "Ropa", icon: "👕" },
-  { name: "Networking", icon: "🤝" }, { name: "Inversión", icon: "📈" },
-  { name: "Deuda", icon: "💳" }, { name: "Viajes", icon: "✈️" }, { name: "Suscripciones", icon: "📱" },
-  { name: "Donaciones", icon: "❤️" }, { name: "Otro", icon: "➕" },
+  { name: "Vivienda" }, { name: "Alimentación" },
+  { name: "Transporte" }, { name: "Entretenimiento" },
+  { name: "Servicios" }, { name: "Salud" },
+  { name: "Educación" }, { name: "Ropa" },
+  { name: "Networking" }, { name: "Inversión" },
+  { name: "Deuda" }, { name: "Viajes" }, { name: "Suscripciones" },
+  { name: "Donaciones" }, { name: "Otro" },
 ];
 
 interface Income  { id: string; category: string; description: string; amount: number; date: string; notes: string }
@@ -76,13 +77,13 @@ function CurrencyConverter({ amount, fromCurrency, onApply }: {
   return (
     <div className="bg-slate-800/60 border border-slate-700/60 rounded-xl p-4 space-y-3">
       <div className="flex items-center justify-between">
-        <div className="text-xs font-medium text-slate-400">💱 Conversor de divisas</div>
+        <div className="text-xs font-medium text-slate-400">Conversor de divisas</div>
         <div className="text-xs text-slate-600">Tiempo real · ExchangeRate-API</div>
       </div>
       <div className="flex items-center gap-2">
         <div className="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-center">
           <div className="text-xs text-slate-500 mb-0.5">Desde</div>
-          <div className="text-white font-bold text-sm">{CURRENCIES.find(c => c.code === fromCurrency)?.flag} {fromCurrency}</div>
+          <div className="text-white font-bold text-sm">{fromCurrency}</div>
           <div className="text-green-400 font-mono text-sm">{amount > 0 ? amount.toLocaleString("es-CO", { minimumFractionDigits: 2 }) : "—"}</div>
         </div>
         <div className="text-slate-500 text-lg shrink-0">→</div>
@@ -91,7 +92,7 @@ function CurrencyConverter({ amount, fromCurrency, onApply }: {
           <select value={to} onChange={e => setTo(e.target.value)}
             className="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-2 text-white text-sm focus:outline-none focus:border-violet-500">
             {CURRENCIES.filter(c => c.code !== fromCurrency).map(c => (
-              <option key={c.code} value={c.code}>{c.flag} {c.code} — {c.name}</option>
+              <option key={c.code} value={c.code}>{c.code} — {c.name}</option>
             ))}
           </select>
         </div>
@@ -327,9 +328,9 @@ export default function FinancesPage() {
       {/* KPIs principales */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[
-          { label: "💰 Ingresos", value: totalIncome,  color: "text-green-400" },
-          { label: "💸 Egresos",  value: totalExpense, color: "text-red-400" },
-          { label: "📊 Balance",  value: balance,      color: balance >= 0 ? "text-blue-400" : "text-red-400", prefix: balance < 0 ? "-" : "" },
+          { label: "Ingresos", value: totalIncome,  color: "text-green-400" },
+          { label: "Egresos",  value: totalExpense, color: "text-red-400" },
+          { label: "Balance",  value: balance,      color: balance >= 0 ? "text-blue-400" : "text-red-400", prefix: balance < 0 ? "-" : "" },
         ].map(kpi => (
           <div key={kpi.label} className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
             <div className="text-xs text-slate-500 mb-2">{kpi.label}</div>
@@ -342,15 +343,15 @@ export default function FinancesPage() {
 
       <div className="grid grid-cols-3 gap-4">
         <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 text-center">
-          <div className="text-xs text-slate-500 mb-1">📈 Savings Rate</div>
+          <div className="text-xs text-slate-500 mb-1">Savings Rate</div>
           <div className={`text-2xl font-black ${savingsRate >= 20 ? "text-green-400" : savingsRate >= 10 ? "text-yellow-400" : "text-red-400"}`}>{savingsRate}%</div>
         </div>
         <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 text-center">
-          <div className="text-xs text-slate-500 mb-1">🔥 Burn Rate</div>
+          <div className="text-xs text-slate-500 mb-1">Burn Rate</div>
           <div className="text-2xl font-black text-orange-400">${burnRate.toLocaleString()}</div>
         </div>
         <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 text-center">
-          <div className="text-xs text-slate-500 mb-1">📋 Transacciones</div>
+          <div className="text-xs text-slate-500 mb-1">Transacciones</div>
           <div className="text-2xl font-black text-slate-300">{incomes.length + expenses.length}</div>
         </div>
       </div>
@@ -360,11 +361,11 @@ export default function FinancesPage() {
       {/* TABS */}
       <div className="flex gap-1 bg-slate-900 border border-slate-800 rounded-xl p-1 overflow-x-auto">
         {([
-          ["overview",  "📊 Resumen"],
-          ["incomes",   `💰 Ingresos (${incomes.length})`],
-          ["expenses",  `💸 Egresos (${expenses.length})`],
-          ["budget",    "📋 Presupuesto"],
-          ["history",   `📈 Historial (${history.length})`],
+          ["overview",  "Resumen"],
+          ["incomes",   `Ingresos (${incomes.length})`],
+          ["expenses",  `Egresos (${expenses.length})`],
+          ["budget",    "Presupuesto"],
+          ["history",   `Historial (${history.length})`],
         ] as [Tab, string][]).map(([tab, label]) => (
           <button key={tab} onClick={() => setActiveTab(tab)}
             className={`flex-1 py-2 text-xs font-medium rounded-lg transition-colors whitespace-nowrap ${
@@ -380,7 +381,7 @@ export default function FinancesPage() {
             <h3 className="text-base font-semibold text-white">Gastos por categoría</h3>
             <button onClick={saveMetricSnapshot}
               className="text-xs text-violet-400 border border-violet-500/40 px-3 py-1.5 rounded-lg hover:bg-violet-900/20 transition-colors">
-              💾 Guardar snapshot
+              Guardar snapshot
             </button>
           </div>
           {expByCategory.length === 0 ? (
@@ -391,14 +392,14 @@ export default function FinancesPage() {
                 <div key={cat.name} className="bg-slate-900 border border-slate-800 rounded-xl p-4">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
-                      <span>{cat.icon}</span>
+                      
                       <span className="text-sm text-white font-medium">{cat.name}</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <span className="text-sm text-white">${cat.spent.toLocaleString()}</span>
                       {cat.limit > 0 && (
                         <span className={`text-xs px-2 py-0.5 rounded-full border font-medium ${alertColor(cat.pct)}`}>
-                          {cat.pct}%{cat.pct >= 100 ? " ⚠️" : ""}
+                          {cat.pct}%{cat.pct >= 100 ? "" : ""}
                         </span>
                       )}
                     </div>
@@ -446,7 +447,7 @@ export default function FinancesPage() {
                   placeholder="Monto" className="flex-1 bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-violet-500 text-sm" />
                 <select value={incomeCurrency} onChange={e => setIncomeCurrency(e.target.value)}
                   className="w-32 bg-slate-800 border border-slate-700 rounded-lg px-2 py-2.5 text-white focus:outline-none focus:border-violet-500 text-sm">
-                  {CURRENCIES.map(c => <option key={c.code} value={c.code}>{c.flag} {c.code}</option>)}
+                  {CURRENCIES.map(c => <option key={c.code} value={c.code}>{c.code}</option>)}
                 </select>
                 <input type="date" value={incomeForm.date} onChange={e => setIncomeForm(p => ({ ...p, date: e.target.value }))}
                   className="bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-violet-500 text-sm" />
@@ -454,7 +455,7 @@ export default function FinancesPage() {
 
               <button onClick={() => setShowIncomeConverter(p => !p)}
                 className="text-xs text-violet-400 hover:text-violet-300 transition-colors">
-                💱 {showIncomeConverter ? "Ocultar conversor" : "Convertir a otra divisa"}
+                {showIncomeConverter ? "Ocultar conversor" : "Convertir a otra divisa"}
               </button>
               {showIncomeConverter && (
                 <CurrencyConverter
@@ -495,8 +496,8 @@ export default function FinancesPage() {
                   <div className="flex items-center gap-3">
                     <div className="text-green-400 font-bold">+${Number(income.amount).toLocaleString("es-CO", { minimumFractionDigits: 2 })}</div>
                     <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button onClick={() => openEditIncome(income)} className="text-slate-500 hover:text-blue-400 text-xs">✎</button>
-                      <button onClick={() => deleteIncome(income.id)} className="text-slate-500 hover:text-red-400 text-xs">✕</button>
+                      <button onClick={() => openEditIncome(income)} className="text-slate-500 hover:text-blue-400 text-xs"><Pencil size={14} /></button>
+                      <button onClick={() => deleteIncome(income.id)} className="text-slate-500 hover:text-red-400 text-xs"><X size={14} /></button>
                     </div>
                   </div>
                 </div>
@@ -526,7 +527,7 @@ export default function FinancesPage() {
                   placeholder="Descripción" className="bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-violet-500 text-sm" />
                 <select value={expenseForm.category} onChange={e => setExpenseForm(p => ({ ...p, category: e.target.value }))}
                   className="bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-violet-500 text-sm">
-                  {EXPENSE_CATEGORIES.map(c => <option key={c.name} value={c.name}>{c.icon} {c.name}</option>)}
+                  {EXPENSE_CATEGORIES.map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
                 </select>
               </div>
               <div className="flex gap-2">
@@ -535,7 +536,7 @@ export default function FinancesPage() {
                   placeholder="Monto" className="flex-1 bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-violet-500 text-sm" />
                 <select value={expenseCurrency} onChange={e => setExpenseCurrency(e.target.value)}
                   className="w-32 bg-slate-800 border border-slate-700 rounded-lg px-2 py-2.5 text-white focus:outline-none focus:border-violet-500 text-sm">
-                  {CURRENCIES.map(c => <option key={c.code} value={c.code}>{c.flag} {c.code}</option>)}
+                  {CURRENCIES.map(c => <option key={c.code} value={c.code}>{c.code}</option>)}
                 </select>
                 <input type="date" value={expenseForm.date} onChange={e => setExpenseForm(p => ({ ...p, date: e.target.value }))}
                   className="bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-violet-500 text-sm" />
@@ -543,7 +544,7 @@ export default function FinancesPage() {
 
               <button onClick={() => setShowExpenseConverter(p => !p)}
                 className="text-xs text-violet-400 hover:text-violet-300 transition-colors">
-                💱 {showExpenseConverter ? "Ocultar conversor" : "Convertir a otra divisa"}
+                {showExpenseConverter ? "Ocultar conversor" : "Convertir a otra divisa"}
               </button>
               {showExpenseConverter && (
                 <CurrencyConverter
@@ -584,7 +585,7 @@ export default function FinancesPage() {
                   <div key={expense.id} className="group flex items-center justify-between bg-slate-900 border border-slate-800 rounded-xl px-4 py-3">
                     <div>
                       <div className="flex items-center gap-2">
-                        <span>{cat?.icon}</span>
+                        
                         <span className="text-sm text-white font-medium">{expense.description}</span>
                         {expense.is_debt && <span className="text-xs text-orange-400 bg-orange-900/30 border border-orange-500/30 px-1.5 py-0.5 rounded-full">Deuda</span>}
                       </div>
@@ -594,8 +595,8 @@ export default function FinancesPage() {
                     <div className="flex items-center gap-3">
                       <div className="text-red-400 font-bold">-${Number(expense.amount).toLocaleString("es-CO", { minimumFractionDigits: 2 })}</div>
                       <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button onClick={() => openEditExpense(expense)} className="text-slate-500 hover:text-blue-400 text-xs">✎</button>
-                        <button onClick={() => deleteExpense(expense.id)} className="text-slate-500 hover:text-red-400 text-xs">✕</button>
+                        <button onClick={() => openEditExpense(expense)} className="text-slate-500 hover:text-blue-400 text-xs"><Pencil size={14} /></button>
+                        <button onClick={() => deleteExpense(expense.id)} className="text-slate-500 hover:text-red-400 text-xs"><X size={14} /></button>
                       </div>
                     </div>
                   </div>
@@ -626,7 +627,7 @@ export default function FinancesPage() {
                   Ingresos ${totalIncome.toLocaleString()} − Egresos ${totalExpense.toLocaleString()}
                 </div>
               </div>
-              <div className="text-5xl">{balance >= 0 ? "✅" : "⚠️"}</div>
+              
             </div>
           </div>
 
@@ -660,7 +661,7 @@ export default function FinancesPage() {
                   <div key={cat.name} className="bg-slate-900 border border-slate-800 rounded-xl p-4">
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
-                        <span>{cat.icon}</span>
+                        
                         <span className="text-sm text-white font-medium">{cat.name}</span>
                       </div>
                       <div className="flex items-center gap-2">
@@ -712,13 +713,12 @@ export default function FinancesPage() {
               <p className="text-xs text-slate-500 mt-0.5">Snapshots guardados mes a mes</p>
             </div>
             <button onClick={saveMetricSnapshot} className="bg-violet-600 hover:bg-violet-700 text-white text-sm px-4 py-2 rounded-lg">
-              💾 Guardar mes actual
+              Guardar mes actual
             </button>
           </div>
 
           {history.length === 0 ? (
             <div className="text-center py-14 bg-slate-900 border border-slate-800 rounded-2xl">
-              <div className="text-4xl mb-3">📈</div>
               <div className="text-slate-400 font-medium mb-1">Sin historial</div>
               <p className="text-slate-600 text-sm max-w-xs mx-auto mb-4">
                 Guarda un snapshot al final de cada mes para ver tu evolución aquí.

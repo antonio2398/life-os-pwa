@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { Check, Pencil, X } from "lucide-react";
 
 const LIFE_AREAS = [
   { id: 1, name: "Salud / Bienestar" },
@@ -239,7 +240,7 @@ export default function HabitsPage() {
       {/* Today checklist */}
       {activeHabits.length > 0 && (
         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
-          <h3 className="text-sm font-semibold text-white mb-4">✅ Check de hoy — {today}</h3>
+          <h3 className="text-sm font-semibold text-white mb-4">Check de hoy — {today}</h3>
           <div className="grid grid-cols-2 gap-2">
             {activeHabits.map(habit => {
               const done = todayDone(habit.id);
@@ -256,11 +257,11 @@ export default function HabitsPage() {
                     className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${done ? "border-transparent" : "border-slate-600"}`}
                     style={done ? { backgroundColor: habit.color } : {}}
                   >
-                    {done && <span className="text-white text-xs">✓</span>}
+                    {done && <Check size={12} className="text-white" />}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="text-sm font-medium truncate">{habit.title}</div>
-                    {habit.current_streak > 0 && <div className="text-xs opacity-60">🔥 {habit.current_streak}d de racha</div>}
+                    {habit.current_streak > 0 && <div className="text-xs opacity-60">{habit.current_streak}d de racha</div>}
                   </div>
                 </button>
               );
@@ -348,7 +349,7 @@ export default function HabitsPage() {
           {(["week", "list"] as const).map(v => (
             <button key={v} onClick={() => setActiveView(v)}
               className={`px-3 py-1 text-xs rounded-md transition-colors ${activeView === v ? "bg-violet-600 text-white" : "text-slate-400 hover:text-white"}`}>
-              {v === "week" ? "📅 Semana" : "📋 Lista"}
+              {v === "week" ? "Semana" : "Lista"}
             </button>
           ))}
         </div>
@@ -364,7 +365,6 @@ export default function HabitsPage() {
         <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden">
           {visibleHabits.length === 0 ? (
             <div className="text-center py-12 text-slate-600">
-              <div className="text-4xl mb-3">❤️</div>
               <div className="text-slate-500">Sin hábitos. Agrega tu primer hábito.</div>
             </div>
           ) : (
@@ -415,14 +415,14 @@ export default function HabitsPage() {
                                 }`}
                                 style={done ? { backgroundColor: habit.color } : {}}
                               >
-                                {done ? "✓" : isT ? "·" : ""}
+                                {done ? <Check size={12} /> : isT ? "·" : ""}
                               </button>
                             </td>
                           );
                         })}
                         <td className="px-4 py-3 text-center">
                           <div className="flex items-center justify-center gap-1">
-                            {habit.current_streak > 0 && <span className="text-orange-400">🔥</span>}
+                            {habit.current_streak > 0 && <span className="text-orange-400"></span>}
                             <span className="text-sm text-white font-medium">{habit.current_streak}d</span>
                           </div>
                           <div className="text-xs text-slate-600">mejor: {habit.best_streak}d</div>
@@ -446,7 +446,6 @@ export default function HabitsPage() {
         <div className="space-y-3">
           {visibleHabits.length === 0 ? (
             <div className="text-center py-12 text-slate-600">
-              <div className="text-4xl mb-3">❤️</div>
               <div className="text-slate-500">Sin hábitos registrados</div>
             </div>
           ) : (
@@ -468,8 +467,8 @@ export default function HabitsPage() {
                       <button onClick={() => toggleActive(habit)} className={`text-xs px-2 py-1 rounded border transition-colors ${habit.is_active ? "border-green-500/50 text-green-400" : "border-slate-700 text-slate-500"}`}>
                         {habit.is_active ? "Activo" : "Inactivo"}
                       </button>
-                      <button onClick={() => openEditHabit(habit)} className="text-slate-500 hover:text-blue-400 text-xs transition-colors">✎</button>
-                      <button onClick={() => deleteHabit(habit.id)} className="text-slate-500 hover:text-red-400 text-xs transition-colors">✕</button>
+                      <button onClick={() => openEditHabit(habit)} className="text-slate-500 hover:text-blue-400 text-xs transition-colors"><Pencil size={14} /></button>
+                      <button onClick={() => deleteHabit(habit.id)} className="text-slate-500 hover:text-red-400 text-xs transition-colors"><X size={14} /></button>
                     </div>
                   </div>
 
@@ -480,7 +479,7 @@ export default function HabitsPage() {
                     </div>
                     <div className="text-center">
                       <div className="text-xl font-black text-orange-400 flex items-center justify-center gap-1">
-                        {habit.current_streak > 0 && "🔥"}{habit.current_streak}
+                        {habit.current_streak > 0 && ""}{habit.current_streak}
                       </div>
                       <div className="text-xs text-slate-500">racha actual</div>
                     </div>
@@ -506,7 +505,7 @@ export default function HabitsPage() {
                             }`}
                             style={done ? { backgroundColor: habit.color } : {}}
                           >
-                            {done ? "✓" : ""}
+                            {done ? <Check size={12} /> : ""}
                           </button>
                         </div>
                       );

@@ -9,7 +9,7 @@ export async function POST(req: NextRequest) {
     if (!user) return NextResponse.json({ error: "No autenticado" }, { status: 401 });
     const { data: userData } = await supabase.from("users").select("gemini_api_key").eq("id", user.id).single();
     const { type, message } = await req.json();
-    if (type === "test") return NextResponse.json({ message: userData?.gemini_api_key ? "API Key detectada âœ…" : "No hay API key configurada." });
+    if (type === "test") return NextResponse.json({ message: userData?.gemini_api_key ? "API Key detectada " : "No hay API key configurada." });
     if (!userData?.gemini_api_key) return NextResponse.json({ error: "Configura tu API Key en Ajustes > IA" }, { status: 400 });
     const prompt = type === "coaching" && message ? buildCoachingPrompt(message, { lifeScore: 70, topChallenges: ["Habitos", "Metas"] }) : buildWeeklyReportPrompt({ lifeScore: 70, diagnosticScores: [], completedTasks: 5, totalTasks: 10, habitCompletion: 75, topPriorities: [] });
     const geminiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${userData.gemini_api_key}`, {

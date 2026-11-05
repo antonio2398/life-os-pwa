@@ -2,13 +2,13 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 const LIFE_AREAS = [
-  { id: 1, name: "Salud / Bienestar", weight: 25, icon: "ðŸ’š" },
-  { id: 2, name: "Finanzas / Inversiones", weight: 25, icon: "ðŸ’°" },
-  { id: 3, name: "Carrera / Negocios", weight: 20, icon: "ðŸ”µ" },
-  { id: 4, name: "Relaciones / Redes", weight: 10, icon: "ðŸŸ£" },
-  { id: 5, name: "Espiritualidad / Proposito", weight: 10, icon: "ðŸŸ " },
-  { id: 6, name: "Aprendizaje / Crecimiento", weight: 5, icon: "ðŸ“˜" },
-  { id: 7, name: "Impacto / Legado", weight: 5, icon: "â¤ï¸" },
+  { id: 1, name: "Salud / Bienestar", weight: 25 },
+  { id: 2, name: "Finanzas / Inversiones", weight: 25 },
+  { id: 3, name: "Carrera / Negocios", weight: 20 },
+  { id: 4, name: "Relaciones / Redes", weight: 10 },
+  { id: 5, name: "Espiritualidad / Proposito", weight: 10 },
+  { id: 6, name: "Aprendizaje / Crecimiento", weight: 5 },
+  { id: 7, name: "Impacto / Legado", weight: 5 },
 ];
 const SCORECARD = [
   { label: "Tareas completadas", target: 10 }, { label: "Deep work (horas)", target: 10 },
@@ -43,12 +43,12 @@ export default function DashboardPage() {
         <div className="flex-1 grid grid-cols-2 gap-3">
           {LIFE_AREAS.map(area => {
             const score = diagnosticScores[area.id] || 0;
-            return (<div key={area.id} className="space-y-1"><div className="flex justify-between text-xs text-slate-400"><span>{area.icon} {area.name}</span><span className="text-white">{score}/100</span></div><div className="h-1.5 bg-slate-800 rounded-full overflow-hidden"><div className={`h-full rounded-full ${score >= 70 ? "bg-green-500" : score >= 40 ? "bg-yellow-500" : "bg-red-500"}`} style={{ width: `${score}%` }} /></div></div>);
+            return (<div key={area.id} className="space-y-1"><div className="flex justify-between text-xs text-slate-400"><span>{area.name}</span><span className="text-white">{score}/100</span></div><div className="h-1.5 bg-slate-800 rounded-full overflow-hidden"><div className={`h-full rounded-full ${score >= 70 ? "bg-green-500" : score >= 40 ? "bg-yellow-500" : "bg-red-500"}`} style={{ width: `${score}%` }} /></div></div>);
           })}
         </div>
       </div>
       <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-        <h3 className="text-lg font-semibold text-white mb-4">ðŸ“Š Scorecard Semanal</h3>
+        <h3 className="text-lg font-semibold text-white mb-4"> Scorecard Semanal</h3>
         <div className="space-y-3">
           {SCORECARD.map((item, i) => {
             const pct = Math.floor(Math.random() * 120);
@@ -58,7 +58,7 @@ export default function DashboardPage() {
         </div>
       </div>
       <div className="grid grid-cols-3 gap-4">
-        {[{ href: "/habits", label: "âœ… Registrar Habitos", desc: "Check diario" },{ href: "/finances", label: "ðŸ’¸ Registrar Gasto", desc: "Movimiento nuevo" },{ href: "/tasks", label: "ðŸ“‹ Ver Tareas", desc: "Pendientes de hoy" }].map(item => (
+        {[{ href: "/habits", label: " Registrar Habitos", desc: "Check diario" },{ href: "/finances", label: " Registrar Gasto", desc: "Movimiento nuevo" },{ href: "/tasks", label: " Ver Tareas", desc: "Pendientes de hoy" }].map(item => (
           <a key={item.href} href={item.href} className="bg-slate-900 border border-slate-800 rounded-xl p-4 hover:border-violet-600 transition-colors"><div className="font-medium text-white">{item.label}</div><div className="text-slate-400 text-sm mt-0.5">{item.desc}</div></a>
         ))}
       </div>

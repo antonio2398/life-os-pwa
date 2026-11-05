@@ -1,15 +1,16 @@
 ﻿"use client";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { X } from "lucide-react";
 
 const LIFE_AREAS = [
-  { id: 1, name: "Salud / Bienestar",          weight: 25, icon: "💚", color: "#22c55e", accent: "accent-green-500",  bar: "bg-green-500",  border: "border-green-500/30",  bg: "bg-green-950/20",  text: "text-green-400" },
-  { id: 2, name: "Finanzas / Inversiones",     weight: 25, icon: "💰", color: "#eab308", accent: "accent-yellow-500", bar: "bg-yellow-500", border: "border-yellow-500/30", bg: "bg-yellow-950/20", text: "text-yellow-400" },
-  { id: 3, name: "Carrera / Negocios",         weight: 20, icon: "🔵", color: "#3b82f6", accent: "accent-blue-500",   bar: "bg-blue-500",   border: "border-blue-500/30",   bg: "bg-blue-950/20",   text: "text-blue-400" },
-  { id: 4, name: "Relaciones / Redes",         weight: 10, icon: "🟣", color: "#a855f7", accent: "accent-purple-500", bar: "bg-purple-500", border: "border-purple-500/30", bg: "bg-purple-950/20", text: "text-purple-400" },
-  { id: 5, name: "Espiritualidad / Propósito", weight: 10, icon: "🟠", color: "#f97316", accent: "accent-orange-500", bar: "bg-orange-500", border: "border-orange-500/30", bg: "bg-orange-950/20", text: "text-orange-400" },
-  { id: 6, name: "Aprendizaje / Crecimiento",  weight:  5, icon: "📘", color: "#06b6d4", accent: "accent-cyan-500",   bar: "bg-cyan-500",   border: "border-cyan-500/30",   bg: "bg-cyan-950/20",   text: "text-cyan-400" },
-  { id: 7, name: "Impacto / Legado",           weight:  5, icon: "❤️", color: "#ef4444", accent: "accent-red-500",    bar: "bg-red-500",    border: "border-red-500/30",    bg: "bg-red-950/20",    text: "text-red-400" },
+  { id: 1, name: "Salud / Bienestar",          weight: 25, color: "#22c55e", accent: "accent-green-500",  bar: "bg-green-500",  border: "border-green-500/30",  bg: "bg-green-950/20",  text: "text-green-400" },
+  { id: 2, name: "Finanzas / Inversiones",     weight: 25, color: "#eab308", accent: "accent-yellow-500", bar: "bg-yellow-500", border: "border-yellow-500/30", bg: "bg-yellow-950/20", text: "text-yellow-400" },
+  { id: 3, name: "Carrera / Negocios",         weight: 20, color: "#3b82f6", accent: "accent-blue-500",   bar: "bg-blue-500",   border: "border-blue-500/30",   bg: "bg-blue-950/20",   text: "text-blue-400" },
+  { id: 4, name: "Relaciones / Redes",         weight: 10, color: "#a855f7", accent: "accent-purple-500", bar: "bg-purple-500", border: "border-purple-500/30", bg: "bg-purple-950/20", text: "text-purple-400" },
+  { id: 5, name: "Espiritualidad / Propósito", weight: 10, color: "#f97316", accent: "accent-orange-500", bar: "bg-orange-500", border: "border-orange-500/30", bg: "bg-orange-950/20", text: "text-orange-400" },
+  { id: 6, name: "Aprendizaje / Crecimiento",  weight:  5, color: "#06b6d4", accent: "accent-cyan-500",   bar: "bg-cyan-500",   border: "border-cyan-500/30",   bg: "bg-cyan-950/20",   text: "text-cyan-400" },
+  { id: 7, name: "Impacto / Legado",           weight:  5, color: "#ef4444", accent: "accent-red-500",    bar: "bg-red-500",    border: "border-red-500/30",    bg: "bg-red-950/20",    text: "text-red-400" },
 ];
 
 const QUESTIONS: Record<number, { id: string; label: string; tip: string }[]> = {
@@ -228,7 +229,7 @@ export default function AreasPage() {
                 className="text-center space-y-2 group cursor-pointer"
                 title={`Ver historial de ${area.name}`}
               >
-                <div className="text-2xl">{area.icon}</div>
+                <span className="block w-3 h-3 rounded-full mx-auto" style={{ backgroundColor: area.color }} />
                 <div className="h-20 bg-slate-800 rounded-lg overflow-hidden flex flex-col justify-end relative">
                   <div className="absolute inset-0 bg-slate-700/0 group-hover:bg-slate-700/30 transition-colors rounded-lg z-10" />
                   <div className="rounded-lg transition-all duration-700" style={{ height: `${score}%`, backgroundColor: area.color }} />
@@ -246,11 +247,11 @@ export default function AreasPage() {
       <div className="flex gap-1 bg-slate-900 border border-slate-800 rounded-xl p-1">
         <button onClick={() => setActiveTab("current")}
           className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${activeTab === "current" ? "bg-violet-600 text-white" : "text-slate-400 hover:text-white"}`}>
-          📊 Evaluación actual
+          Evaluación actual
         </button>
         <button onClick={() => setActiveTab("history")}
           className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${activeTab === "history" ? "bg-violet-600 text-white" : "text-slate-400 hover:text-white"}`}>
-          📈 Historial completo
+          Historial completo
         </button>
       </div>
 
@@ -275,7 +276,7 @@ export default function AreasPage() {
                 <div className="p-5">
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center gap-3">
-                      <span className="text-3xl">{area.icon}</span>
+                      <span className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: area.color }} />
                       <div>
                         <div className="font-semibold text-white text-lg">{area.name}</div>
                         <div className="text-xs text-slate-500">
@@ -318,11 +319,11 @@ export default function AreasPage() {
                         <span>Objetivo 90d:</span>
                         <span className="text-slate-300 font-medium">{target}/100</span>
                         <span className={score >= target ? "text-green-400" : "text-yellow-400"}>
-                          {score >= target ? "✓ Alcanzado" : `+${target - score} por lograr`}
+                          {score >= target ? "Alcanzado" : `+${target - score} por lograr`}
                         </span>
                       </div>
                     )}
-                    {current?.notes && <div className="text-xs text-slate-400 italic">💬 {current.notes}</div>}
+                    {current?.notes && <div className="text-xs text-slate-400 italic">{current.notes}</div>}
                     {current?.evaluated_at && (
                       <div className="text-xs text-slate-600">Última evaluación: {fmtDate(current.evaluated_at)}</div>
                     )}
@@ -494,7 +495,7 @@ export default function AreasPage() {
                   histArea === area.id ? "text-white" : "border-slate-700 text-slate-400 hover:text-white hover:border-slate-500"
                 }`}
                 style={histArea === area.id ? { backgroundColor: area.color + "30", borderColor: area.color + "60", color: area.color } : {}}>
-                {area.icon} {area.name.split(" / ")[0]}
+                {area.name.split(" / ")[0]}
                 <span className="text-slate-500 font-mono ml-1">({allRecords[area.id]?.length ?? 0})</span>
               </button>
             ))}
@@ -503,7 +504,7 @@ export default function AreasPage() {
           {/* ── Life Score trend (all areas) ── */}
           {histArea === null && (
             <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
-              <h3 className="text-sm font-semibold text-white mb-4">📈 Evolución del Life Score global</h3>
+              <h3 className="text-sm font-semibold text-white mb-4">Evolución del Life Score global</h3>
 
               {/* Build timeline: get all unique dates, compute life score for each */}
               {(() => {
@@ -598,7 +599,7 @@ export default function AreasPage() {
             if (recs.length === 0) return (
               <div key={area.id} className={`border rounded-2xl p-5 ${area.border} ${area.bg}`}>
                 <div className="flex items-center gap-3 mb-2">
-                  <span className="text-2xl">{area.icon}</span>
+                  <span className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: area.color }} />
                   <span className="font-semibold text-white">{area.name}</span>
                 </div>
                 <div className="text-slate-600 text-sm">Sin evaluaciones. Usa la pestaña "Evaluación actual" para empezar.</div>
@@ -616,7 +617,7 @@ export default function AreasPage() {
                 <div className="p-5">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3">
-                      <span className="text-2xl">{area.icon}</span>
+                      <span className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: area.color }} />
                       <div>
                         <div className="font-semibold text-white">{area.name}</div>
                         <div className="text-xs text-slate-500">{recs.length} evaluación{recs.length !== 1 ? "es" : ""} · Peso: {area.weight}%</div>
@@ -726,14 +727,12 @@ export default function AreasPage() {
                             </div>
                           )}
 
-                          {rec.notes && <div className="text-xs text-slate-400 italic">💬 {rec.notes}</div>}
+                          {rec.notes && <div className="text-xs text-slate-400 italic">{rec.notes}</div>}
                         </div>
 
                         {/* Delete */}
                         <button onClick={() => deleteRecord(rec.id)}
-                          className="text-slate-700 hover:text-red-400 text-xs transition-colors shrink-0 mt-0.5">
-                          ✕
-                        </button>
+                          className="text-slate-700 hover:text-red-400 text-xs transition-colors shrink-0 mt-0.5"><X size={14} /></button>
                       </div>
                     );
                   })}

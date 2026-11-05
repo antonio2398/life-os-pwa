@@ -26,7 +26,6 @@ export default function ForgotPasswordPage() {
     <div className="min-h-screen bg-slate-950 flex items-center justify-center px-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <div className="text-4xl mb-3">🔑</div>
           <h1 className="text-2xl font-bold text-white">¿Olvidaste tu contraseña?</h1>
           <p className="text-slate-400 text-sm mt-2">
             Ingresa tu email y te enviamos un enlace para restablecerla.
@@ -35,7 +34,6 @@ export default function ForgotPasswordPage() {
 
         {sent ? (
           <div className="bg-green-900/30 border border-green-500/40 rounded-2xl p-6 text-center">
-            <div className="text-3xl mb-3">📧</div>
             <div className="text-green-400 font-semibold mb-1">Revisa tu correo</div>
             <p className="text-slate-400 text-sm">
               Enviamos un enlace a <strong className="text-white">{email}</strong>. 

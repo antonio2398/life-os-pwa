@@ -22,8 +22,8 @@ const PRIORITY_CONFIG: Record<string, { label: string; badge: string; dot: strin
 const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
   planned:     { label: "Planificado",  color: "text-slate-400" },
   in_progress: { label: "En progreso",  color: "text-blue-400" },
-  achieved:    { label: "Logrado ✓",    color: "text-green-400" },
-  completed:   { label: "Completado ✓", color: "text-green-400" },
+  achieved:    { label: "Logrado",    color: "text-green-400" },
+  completed:   { label: "Completado", color: "text-green-400" },
   paused:      { label: "En pausa",     color: "text-yellow-400" },
 };
 
@@ -199,7 +199,7 @@ export default function GoalsPage() {
       <div className="flex gap-1 bg-slate-900 border border-slate-800 rounded-xl p-1">
         {(["dreams", "goals"] as const).map(tab => (
           <button key={tab} onClick={() => setActiveTab(tab)} className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${activeTab === tab ? "bg-violet-600 text-white" : "text-slate-400 hover:text-white"}`}>
-            {tab === "dreams" ? `🌟 Sueños (${dreams.length})` : `🎯 Metas 90 días (${goals.length})`}
+            {tab === "dreams" ? `Sueños (${dreams.length})` : `Metas 90 días (${goals.length})`}
           </button>
         ))}
       </div>
@@ -229,10 +229,10 @@ export default function GoalsPage() {
                   {LIFE_AREAS.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
                 </select>
                 <select value={dreamForm.priority} onChange={e => setDreamForm(p => ({ ...p, priority: e.target.value }))} className="bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-violet-500 text-sm">
-                  <option value="critical">🔴 Crítica</option>
-                  <option value="high">🟠 Alta</option>
-                  <option value="medium">🟡 Media</option>
-                  <option value="low">🟢 Baja</option>
+                  <option value="critical">Crítica</option>
+                  <option value="high">Alta</option>
+                  <option value="medium">Media</option>
+                  <option value="low">Baja</option>
                 </select>
                 <select value={dreamForm.status} onChange={e => setDreamForm(p => ({ ...p, status: e.target.value }))} className="bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-violet-500 text-sm">
                   <option value="planned">Planificado</option>
@@ -251,7 +251,6 @@ export default function GoalsPage() {
           {/* Dream List */}
           {dreams.length === 0 ? (
             <div className="text-center py-16 text-slate-600">
-              <div className="text-5xl mb-4">🌟</div>
               <div className="text-lg font-medium text-slate-500">Sin sueños registrados</div>
               <div className="text-sm mt-1">¿Cuál es tu gran visión para los próximos 10-30 años?</div>
             </div>
@@ -312,7 +311,7 @@ export default function GoalsPage() {
                         <div key={goal.id} className="flex items-center gap-3 bg-slate-800/50 rounded-lg px-3 py-2">
                           <div className="flex-1">
                             <div className="text-sm text-white">{goal.title}</div>
-                            {goal.target_date && <div className="text-xs text-slate-500">📅 {goal.target_date}</div>}
+                            {goal.target_date && <div className="text-xs text-slate-500">{goal.target_date}</div>}
                           </div>
                           <div className="flex items-center gap-2">
                             <div className="w-16 h-1.5 bg-slate-700 rounded-full overflow-hidden">
@@ -385,7 +384,6 @@ export default function GoalsPage() {
           {/* Goals List */}
           {goals.length === 0 ? (
             <div className="text-center py-16 text-slate-600">
-              <div className="text-5xl mb-4">🎯</div>
               <div className="text-lg font-medium text-slate-500">Sin metas registradas</div>
               <div className="text-sm mt-1">Define tus OKRs para los próximos 90 días</div>
             </div>
@@ -403,7 +401,7 @@ export default function GoalsPage() {
                       <div className="flex items-center gap-2 mt-1 flex-wrap">
                         <span className="text-xs text-slate-500">{area?.name}</span>
                         {dream && <><span className="text-slate-700">·</span><span className="text-xs text-violet-400">↑ {dream.title}</span></>}
-                        {goal.target_date && <><span className="text-slate-700">·</span><span className={`text-xs ${daysLeft !== null && daysLeft < 14 ? "text-red-400" : "text-slate-500"}`}>📅 {goal.target_date}{daysLeft !== null && ` (${daysLeft > 0 ? `${daysLeft}d restantes` : "Vencida"})`}</span></>}
+                        {goal.target_date && <><span className="text-slate-700">·</span><span className={`text-xs ${daysLeft !== null && daysLeft < 14 ? "text-red-400" : "text-slate-500"}`}>{goal.target_date}{daysLeft !== null && ` (${daysLeft > 0 ? `${daysLeft}d restantes` : "Vencida"})`}</span></>}
                       </div>
                       {goal.description && <div className="text-sm text-slate-400 mt-2">{goal.description}</div>}
                     </div>

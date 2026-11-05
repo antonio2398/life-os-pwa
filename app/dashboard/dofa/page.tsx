@@ -1,6 +1,7 @@
 ﻿"use client";
 import { useEffect, useState, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { Check, Pencil, X } from "lucide-react";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 type SwotType     = "strength" | "weakness" | "opportunity" | "threat";
@@ -31,7 +32,6 @@ interface DiagnosticSummary {
 const QUADRANTS: {
   type:   SwotType;
   label:  string;
-  icon:   string;
   color:  string;
   bg:     string;
   border: string;
@@ -39,25 +39,25 @@ const QUADRANTS: {
   placeholder: string;
 }[] = [
   {
-    type: "strength", label: "Fortalezas", icon: "💪",
+    type: "strength", label: "Fortalezas",
     color: "text-green-400", bg: "bg-green-950/20", border: "border-green-500/40",
     desc: "Lo que haces bien, ventajas y recursos actuales",
     placeholder: "Ej: Disciplina financiera y alta tasa de ahorro...",
   },
   {
-    type: "weakness", label: "Debilidades", icon: "⚠️",
+    type: "weakness", label: "Debilidades",
     color: "text-red-400", bg: "bg-red-950/20", border: "border-red-500/40",
     desc: "Áreas de mejora y limitaciones actuales",
     placeholder: "Ej: Foco disperso entre múltiples proyectos...",
   },
   {
-    type: "opportunity", label: "Oportunidades", icon: "🌱",
+    type: "opportunity", label: "Oportunidades",
     color: "text-blue-400", bg: "bg-blue-950/20", border: "border-blue-500/40",
     desc: "Tendencias externas que puedes aprovechar",
     placeholder: "Ej: Boom de IA para automatizar operaciones...",
   },
   {
-    type: "threat", label: "Amenazas", icon: "🚨",
+    type: "threat", label: "Amenazas",
     color: "text-yellow-400", bg: "bg-yellow-950/20", border: "border-yellow-500/40",
     desc: "Riesgos externos o internos a mitigar",
     placeholder: "Ej: Dependencia de ingreso activo único...",
@@ -69,23 +69,22 @@ const STRAT_CONFIG: {
   label: string;
   logic: string;
   color: string;
-  icon:  string;
   desc:  string;
 }[] = [
-  { type: "FO", label: "FO — Crecer",        logic: "Fortaleza + Oportunidad", color: "border-green-500/30  bg-green-950/20",  icon: "🚀", desc: "Usa tus fortalezas para capturar oportunidades" },
-  { type: "DO", label: "DO — Mejorar",       logic: "Debilidad + Oportunidad", color: "border-blue-500/30   bg-blue-950/20",   icon: "🔧", desc: "Corrige debilidades para capturar oportunidades" },
-  { type: "FA", label: "FA — Defender",      logic: "Fortaleza + Amenaza",     color: "border-yellow-500/30 bg-yellow-950/20", icon: "🛡️", desc: "Usa fortalezas para neutralizar amenazas" },
-  { type: "DA", label: "DA — Evitar riesgo", logic: "Debilidad + Amenaza",     color: "border-red-500/30    bg-red-950/20",    icon: "⚠️", desc: "Reduce debilidades para evitar riesgos críticos" },
+  { type: "FO", label: "FO — Crecer",        logic: "Fortaleza + Oportunidad", color: "border-green-500/30  bg-green-950/20", desc: "Usa tus fortalezas para capturar oportunidades" },
+  { type: "DO", label: "DO — Mejorar",       logic: "Debilidad + Oportunidad", color: "border-blue-500/30   bg-blue-950/20", desc: "Corrige debilidades para capturar oportunidades" },
+  { type: "FA", label: "FA — Defender",      logic: "Fortaleza + Amenaza",     color: "border-yellow-500/30 bg-yellow-950/20", desc: "Usa fortalezas para neutralizar amenazas" },
+  { type: "DA", label: "DA — Evitar riesgo", logic: "Debilidad + Amenaza",     color: "border-red-500/30    bg-red-950/20", desc: "Reduce debilidades para evitar riesgos críticos" },
 ];
 
-const AREA_LABELS: Record<number, { name: string; icon: string }> = {
-  1: { name: "Salud / Bienestar",           icon: "💚" },
-  2: { name: "Finanzas / Inversiones",      icon: "💰" },
-  3: { name: "Carrera / Negocios",          icon: "🔵" },
-  4: { name: "Relaciones / Redes",          icon: "🟣" },
-  5: { name: "Espiritualidad / Propósito",  icon: "🟠" },
-  6: { name: "Aprendizaje / Crecimiento",   icon: "📘" },
-  7: { name: "Impacto / Legado",            icon: "❤️"  },
+const AREA_LABELS: Record<number, { name: string }> = {
+  1: { name: "Salud / Bienestar" },
+  2: { name: "Finanzas / Inversiones" },
+  3: { name: "Carrera / Negocios" },
+  4: { name: "Relaciones / Redes" },
+  5: { name: "Espiritualidad / Propósito" },
+  6: { name: "Aprendizaje / Crecimiento" },
+  7: { name: "Impacto / Legado"  },
 };
 
 const AREA_WEIGHTS: Record<number, number> = { 1:25, 2:25, 3:20, 4:10, 5:10, 6:5, 7:5 };
@@ -313,14 +312,14 @@ export default function DofaPage() {
         >
           {aiLoading
             ? <><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin inline-block" /> Analizando...</>
-            : <>🤖 Generar con IA</>}
+            : <>Generar con IA</>}
         </button>
       </div>
 
       {/* ── AI ERROR ──────────────────────────────────────────────────────────*/}
       {aiError && (
         <div className="bg-red-900/30 border border-red-700/60 rounded-xl px-4 py-3 text-sm text-red-300 flex gap-3 items-start">
-          <span className="shrink-0">❌</span>
+          <span className="shrink-0"></span>
           <div>
             <strong className="text-red-200">Error:</strong> {aiError}
             {aiError.includes("diagnóstico") && (
@@ -336,7 +335,7 @@ export default function DofaPage() {
       {preview && (
         <div className="bg-violet-900/30 border border-violet-500/50 rounded-xl px-5 py-4 flex items-start justify-between gap-4">
           <div>
-            <div className="text-white font-semibold text-sm">✨ DOFA generado con IA desde tu diagnóstico</div>
+            <div className="text-white font-semibold text-sm">DOFA generado con IA desde tu diagnóstico</div>
             <div className="text-violet-300 text-xs mt-1">
               Edita los ítems antes de guardar. Los ítems manuales no se modifican.
             </div>
@@ -350,7 +349,7 @@ export default function DofaPage() {
               onClick={saveAiPreview}
               disabled={saving}
               className="bg-violet-600 hover:bg-violet-700 disabled:opacity-50 text-white text-sm px-5 py-2 rounded-lg font-medium transition-colors"
-            >{saving ? "Guardando..." : "✅ Guardar DOFA"}</button>
+            >{saving ? "Guardando..." : "Guardar DOFA"}</button>
           </div>
         </div>
       )}
@@ -358,10 +357,10 @@ export default function DofaPage() {
       {/* ── TABS ──────────────────────────────────────────────────────────────*/}
       <div className="flex gap-1 bg-slate-900 border border-slate-800 rounded-xl p-1">
         {([
-          ["diagnostic", `🔍 Diagnóstico (${diagScores.length}/7)`],
-          ["dofa",       `📊 Análisis${preview ? " (preview)" : ` (${totalSwot})`}`],
-          ["strategies", `⚡ Estrategias (${totalStrats})`],
-          ["scorecard",  "📋 Scorecard"],
+          ["diagnostic", `Diagnóstico (${diagScores.length}/7)`],
+          ["dofa",       `Análisis${preview ? " (preview)" : ` (${totalSwot})`}`],
+          ["strategies", `Estrategias (${totalStrats})`],
+          ["scorecard",  "Scorecard"],
         ] as [typeof activeTab, string][]).map(([tab, label]) => (
           <button key={tab} onClick={() => setActiveTab(tab)}
             className={`flex-1 py-2 text-xs font-medium rounded-lg transition-colors ${
@@ -408,19 +407,18 @@ export default function DofaPage() {
                 </div>
                 {diagSummary.areasEvaluated < 7 ? (
                   <p className="text-xs text-yellow-400 pt-0.5">
-                    ⚠️ Evalúa las {7 - diagSummary.areasEvaluated} áreas restantes para un DOFA más preciso.{" "}
+                    Evalúa las {7 - diagSummary.areasEvaluated} áreas restantes para un DOFA más preciso.{" "}
                     <a href="/areas" className="underline hover:text-yellow-300">Ir al diagnóstico →</a>
                   </p>
                 ) : (
                   <p className="text-xs text-green-400 pt-0.5">
-                    ✅ Diagnóstico completo. La IA tiene todos los datos necesarios.
+                    Diagnóstico completo. La IA tiene todos los datos necesarios.
                   </p>
                 )}
               </div>
             </div>
           ) : (
             <div className="text-center py-16 bg-slate-900 border border-slate-800 rounded-2xl">
-              <div className="text-5xl mb-4">📊</div>
               <div className="text-lg font-medium text-slate-400 mb-2">Sin diagnóstico todavía</div>
               <p className="text-slate-500 text-sm max-w-xs mx-auto mb-5">
                 Evalúa tus áreas de vida para que la IA pueda analizar tu situación y generar un DOFA personalizado.
@@ -440,7 +438,6 @@ export default function DofaPage() {
                 const score  = found?.score ?? null;
                 return (
                   <div key={areaId} className={`flex items-center gap-4 bg-slate-900 border rounded-xl px-5 py-3.5 transition-opacity ${!found ? "border-slate-800 opacity-50" : "border-slate-700"}`}>
-                    <span className="text-xl shrink-0">{area.icon}</span>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between mb-1">
                         <span className="text-sm font-medium text-white">{area.name}</span>
@@ -489,7 +486,7 @@ export default function DofaPage() {
             >
               {aiLoading
                 ? <><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Generando DOFA...</>
-                : <>🤖 Generar DOFA automáticamente desde este diagnóstico</>}
+                : <>Generar DOFA automáticamente desde este diagnóstico</>}
             </button>
           )}
         </div>
@@ -500,7 +497,7 @@ export default function DofaPage() {
       ════════════════════════════════════════════════════════════════════*/}
       {activeTab === "dofa" && (
         <div className="grid grid-cols-2 gap-4">
-          {QUADRANTS.map(({ type, label, icon, color, bg, border, desc, placeholder }) => {
+          {QUADRANTS.map(({ type, label, color, bg, border, desc, placeholder }) => {
             const dbItems   = items[type];
             const isPreview = !!preview;
             const dispItems: string[] = isPreview
@@ -513,7 +510,6 @@ export default function DofaPage() {
                   {/* Header */}
                   <div className="flex items-center justify-between mb-1">
                     <div className="flex items-center gap-2">
-                      <span className="text-xl">{icon}</span>
                       <span className="font-bold text-white">{label}</span>
                     </div>
                     <span className={`text-xs font-medium ${color}`}>{dispItems.length}</span>
@@ -536,8 +532,8 @@ export default function DofaPage() {
                               <input value={editingContent} onChange={e => setEditingContent(e.target.value)}
                                 onKeyDown={e => { if (e.key==="Enter") updateItem(iid); if (e.key==="Escape") setEditingId(null); }}
                                 className="flex-1 bg-slate-700 border border-violet-500 rounded px-2 py-0.5 text-white text-sm focus:outline-none" autoFocus />
-                              <button onClick={() => updateItem(iid)} className="text-green-400 text-xs">✓</button>
-                              <button onClick={() => setEditingId(null)} className="text-slate-400 text-xs">✕</button>
+                              <button onClick={() => updateItem(iid)} className="text-green-400 text-xs"><Check size={14} /></button>
+                              <button onClick={() => setEditingId(null)} className="text-slate-400 text-xs"><X size={14} /></button>
                             </div>
                           ) : isPreview ? (
                             <div className="flex-1 flex gap-1">
@@ -550,15 +546,15 @@ export default function DofaPage() {
                                 className="flex-1 bg-transparent text-sm text-slate-200 focus:outline-none focus:text-white min-w-0"
                               />
                               <button onClick={() => setPendingItems(p => ({ ...p, [type]: (p[type]??[]).filter((_,i)=>i!==idx) }))}
-                                className="text-slate-600 hover:text-red-400 text-xs opacity-0 group-hover:opacity-100 shrink-0">✕</button>
+                                className="text-slate-600 hover:text-red-400 text-xs opacity-0 group-hover:opacity-100 shrink-0"><X size={14} /></button>
                             </div>
                           ) : (
                             <div className="flex-1 flex items-start justify-between gap-1 min-w-0">
                               <span className="text-sm text-slate-200 leading-snug">{content}</span>
                               <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0 ml-1">
                                 {isAI && <span className="text-xs text-violet-400 bg-violet-900/30 px-1 rounded">IA</span>}
-                                <button onClick={() => { setEditingId(iid); setEditingContent(content); }} className="text-slate-500 hover:text-blue-400 text-xs">✎</button>
-                                <button onClick={() => deleteItem(iid, type)} className="text-slate-500 hover:text-red-400 text-xs">✕</button>
+                                <button onClick={() => { setEditingId(iid); setEditingContent(content); }} className="text-slate-500 hover:text-blue-400 text-xs"><Pencil size={14} /></button>
+                                <button onClick={() => deleteItem(iid, type)} className="text-slate-500 hover:text-red-400 text-xs"><X size={14} /></button>
                               </div>
                             </div>
                           )}
@@ -604,11 +600,11 @@ export default function DofaPage() {
         <div className="space-y-3">
           {preview && (
             <div className="bg-slate-800/50 border border-violet-500/30 rounded-xl px-4 py-3 text-sm text-violet-300">
-              ✨ Revisa las estrategias generadas por IA y edítalas antes de guardar.
+              Revisa las estrategias generadas por IA y edítalas antes de guardar.
             </div>
           )}
 
-          {STRAT_CONFIG.map(({ type, label, logic, color, icon, desc }) => {
+          {STRAT_CONFIG.map(({ type, label, logic, color, desc }) => {
             const dbItems   = strategies[type];
             const isPreview = !!preview;
             const dispItems: string[] = isPreview
@@ -623,7 +619,6 @@ export default function DofaPage() {
                   className="w-full flex items-center justify-between px-5 py-4 text-left"
                 >
                   <div className="flex items-center gap-3">
-                    <span className="text-xl">{icon}</span>
                     <div>
                       <div className="font-bold text-white">{label}</div>
                       <div className="text-xs text-slate-500">{logic} · {desc}</div>
@@ -650,8 +645,8 @@ export default function DofaPage() {
                               <input value={editingContent} onChange={e => setEditingContent(e.target.value)}
                                 onKeyDown={e => { if (e.key==="Enter") updateItem(iid); if (e.key==="Escape") setEditingId(null); }}
                                 className="flex-1 bg-slate-700 border border-violet-500 rounded px-2 py-1 text-white text-sm focus:outline-none" autoFocus />
-                              <button onClick={() => updateItem(iid)} className="text-green-400 text-xs">✓</button>
-                              <button onClick={() => setEditingId(null)} className="text-slate-400 text-xs">✕</button>
+                              <button onClick={() => updateItem(iid)} className="text-green-400 text-xs"><Check size={14} /></button>
+                              <button onClick={() => setEditingId(null)} className="text-slate-400 text-xs"><X size={14} /></button>
                             </div>
                           ) : isPreview ? (
                             <div className="flex-1 flex gap-1">
@@ -664,15 +659,15 @@ export default function DofaPage() {
                                 className="flex-1 bg-transparent text-sm text-slate-200 focus:outline-none"
                               />
                               <button onClick={() => setPendingStrats(p => ({ ...p, [type]: (p[type]??[]).filter((_,i)=>i!==idx) }))}
-                                className="text-slate-600 hover:text-red-400 text-xs opacity-0 group-hover:opacity-100 shrink-0">✕</button>
+                                className="text-slate-600 hover:text-red-400 text-xs opacity-0 group-hover:opacity-100 shrink-0"><X size={14} /></button>
                             </div>
                           ) : (
                             <div className="flex-1 flex items-start justify-between gap-2">
                               <span className="text-sm text-slate-200 leading-snug">{content}</span>
                               <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
                                 {dbItem?.source === "ai" && <span className="text-xs text-violet-400">IA</span>}
-                                <button onClick={() => { setEditingId(iid); setEditingContent(content); }} className="text-slate-500 hover:text-blue-400 text-xs">✎</button>
-                                <button onClick={() => deleteItem(iid, type)} className="text-slate-500 hover:text-red-400 text-xs">✕</button>
+                                <button onClick={() => { setEditingId(iid); setEditingContent(content); }} className="text-slate-500 hover:text-blue-400 text-xs"><Pencil size={14} /></button>
+                                <button onClick={() => deleteItem(iid, type)} className="text-slate-500 hover:text-red-400 text-xs"><X size={14} /></button>
                               </div>
                             </div>
                           )}
@@ -752,7 +747,7 @@ export default function DofaPage() {
                             <span className={`text-sm font-bold w-12 text-right tabular-nums ${ok ? "text-green-400" : pct >= 70 ? "text-yellow-400" : "text-red-400"}`}>
                               {Math.min(pct, 100)}%
                             </span>
-                            <span>{ok ? "🟢" : pct >= 70 ? "🟡" : "🔴"}</span>
+                            <span className={`w-2.5 h-2.5 rounded-full ${ok ? "bg-green-500" : pct >= 70 ? "bg-yellow-500" : "bg-red-500"}`} />
                           </>
                         )}
                       </div>
@@ -815,7 +810,7 @@ export default function DofaPage() {
           </div>
 
           <div className="bg-slate-900 border border-violet-500/20 rounded-xl px-5 py-4 text-sm text-slate-400">
-            <span className="text-violet-400 font-medium">💡 Tip:</span> Este scorecard es de sesión. Para guardar tus métricas semanales permanentemente, usa el módulo de <strong className="text-white">Revisión Semanal</strong> en el Dashboard principal.
+            <span className="text-violet-400 font-medium">Tip:</span> Este scorecard es de sesión. Para guardar tus métricas semanales permanentemente, usa el módulo de <strong className="text-white">Revisión Semanal</strong> en el Dashboard principal.
           </div>
         </div>
       )}

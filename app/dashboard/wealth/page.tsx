@@ -3,20 +3,20 @@ import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
 const ASSET_TYPES = [
-  { value: "cash",         label: "Efectivo / Cuenta",     icon: "🏦" },
-  { value: "investment",   label: "Inversiones",            icon: "📈" },
-  { value: "real_estate",  label: "Bienes raíces",          icon: "🏠" },
-  { value: "business",     label: "Negocio / Empresa",      icon: "🏢" },
-  { value: "crypto",       label: "Criptomonedas",          icon: "₿"  },
-  { value: "other",        label: "Otro",                   icon: "💼" },
+  { value: "cash",         label: "Efectivo / Cuenta" },
+  { value: "investment",   label: "Inversiones" },
+  { value: "real_estate",  label: "Bienes raíces" },
+  { value: "business",     label: "Negocio / Empresa" },
+  { value: "crypto",       label: "Criptomonedas"  },
+  { value: "other",        label: "Otro" },
 ];
 
 const LIABILITY_TYPES = [
-  { value: "credit_card",    label: "Tarjeta de crédito",  icon: "💳" },
-  { value: "personal_loan",  label: "Préstamo personal",   icon: "🤝" },
-  { value: "mortgage",       label: "Hipoteca",            icon: "🏠" },
-  { value: "auto_loan",      label: "Financiamiento auto", icon: "🚗" },
-  { value: "other",          label: "Otro",                icon: "📄" },
+  { value: "credit_card",    label: "Tarjeta de crédito" },
+  { value: "personal_loan",  label: "Préstamo personal" },
+  { value: "mortgage",       label: "Hipoteca" },
+  { value: "auto_loan",      label: "Financiamiento auto" },
+  { value: "other",          label: "Otro" },
 ];
 
 const ASSET_ROLES = [
@@ -208,15 +208,15 @@ export default function WealthPage() {
         </div>
         <div className="grid grid-cols-3 gap-4 text-center">
           <div>
-            <div className="text-xs text-slate-500 mb-1">🏦 Activos</div>
+            <div className="text-xs text-slate-500 mb-1">Activos</div>
             <div className="text-xl font-bold text-green-400">${totalAssets.toLocaleString()}</div>
           </div>
           <div>
-            <div className="text-xs text-slate-500 mb-1">🏧 Pasivos</div>
+            <div className="text-xs text-slate-500 mb-1">Pasivos</div>
             <div className="text-xl font-bold text-red-400">${totalLiabilities.toLocaleString()}</div>
           </div>
           <div>
-            <div className="text-xs text-slate-500 mb-1">📉 Debt Ratio</div>
+            <div className="text-xs text-slate-500 mb-1">Debt Ratio</div>
             <div className={`text-xl font-bold ${debtRatio <= 30 ? "text-green-400" : debtRatio <= 60 ? "text-yellow-400" : "text-red-400"}`}>{debtRatio}%</div>
           </div>
         </div>
@@ -243,7 +243,7 @@ export default function WealthPage() {
                 return (
                   <div key={t.value} className="flex items-center gap-1">
                     <div className="w-2 h-2 rounded-full" style={{ backgroundColor: colors[i % colors.length] }} />
-                    <span className="text-xs text-slate-400">{t.icon} {t.label} {t.pct}%</span>
+                    <span className="text-xs text-slate-400">{t.label} {t.pct}%</span>
                   </div>
                 );
               })}
@@ -254,7 +254,7 @@ export default function WealthPage() {
 
       {/* Tabs */}
       <div className="flex gap-1 bg-slate-900 border border-slate-800 rounded-xl p-1">
-        {([["overview", "📊 Resumen"], ["assets", `🏦 Activos (${assets.length})`], ["liabilities", `🏧 Pasivos (${liabilities.length})`], ["plan", "🗺️ Plan deuda"]] as ["overview" | "assets" | "liabilities" | "plan", string][]).map(([tab, label]) => (
+        {([["overview", "Resumen"], ["assets", `Activos (${assets.length})`], ["liabilities", `Pasivos (${liabilities.length})`], ["plan", "Plan deuda"]] as ["overview" | "assets" | "liabilities" | "plan", string][]).map(([tab, label]) => (
           <button key={tab} onClick={() => setActiveTab(tab)} className={`flex-1 py-2 text-xs font-medium rounded-lg transition-colors ${activeTab === tab ? "bg-violet-600 text-white" : "text-slate-400 hover:text-white"}`}>{label}</button>
         ))}
       </div>
@@ -265,13 +265,13 @@ export default function WealthPage() {
           <div className="grid grid-cols-2 gap-4">
             {/* Assets summary */}
             <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
-              <h3 className="font-semibold text-white mb-4">🏦 Activos por tipo</h3>
+              <h3 className="font-semibold text-white mb-4">Activos por tipo</h3>
               {assetsByType.length === 0 ? <div className="text-slate-600 text-sm">Sin activos registrados</div> : (
                 <div className="space-y-3">
                   {assetsByType.map(t => (
                     <div key={t.value}>
                       <div className="flex justify-between text-sm mb-1">
-                        <span className="text-slate-300">{t.icon} {t.label}</span>
+                        <span className="text-slate-300">{t.label}</span>
                         <span className="text-white font-medium">${t.total.toLocaleString()}</span>
                       </div>
                       <div className="h-1.5 bg-slate-800 rounded-full overflow-hidden">
@@ -286,7 +286,7 @@ export default function WealthPage() {
 
             {/* Liabilities summary */}
             <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
-              <h3 className="font-semibold text-white mb-4">🏧 Resumen de deudas</h3>
+              <h3 className="font-semibold text-white mb-4">Resumen de deudas</h3>
               {liabilities.length === 0 ? <div className="text-slate-600 text-sm">Sin pasivos registrados</div> : (
                 <div className="space-y-3">
                   <div className="flex justify-between text-sm">
@@ -332,7 +332,7 @@ export default function WealthPage() {
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <select value={assetForm.type} onChange={e => setAssetForm(p => ({ ...p, type: e.target.value }))} className="bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-violet-500 text-sm">
-                  {ASSET_TYPES.map(t => <option key={t.value} value={t.value}>{t.icon} {t.label}</option>)}
+                  {ASSET_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
                 </select>
                 <select value={assetForm.role} onChange={e => setAssetForm(p => ({ ...p, role: e.target.value }))} className="bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-violet-500 text-sm">
                   {ASSET_ROLES.map(r => <option key={r}>{r}</option>)}
@@ -351,7 +351,7 @@ export default function WealthPage() {
           )}
 
           {assets.length === 0 ? (
-            <div className="text-center py-12 text-slate-600"><div className="text-4xl mb-3">🏦</div><div className="text-slate-500">Sin activos registrados</div></div>
+            <div className="text-center py-12 text-slate-600"><div className="text-slate-500">Sin activos registrados</div></div>
           ) : (
             <div className="space-y-3">
               {assets.map(asset => {
@@ -361,7 +361,6 @@ export default function WealthPage() {
                   <div key={asset.id} className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex items-start gap-3 flex-1">
-                        <span className="text-2xl">{typeInfo?.icon}</span>
                         <div className="flex-1">
                           <div className="font-semibold text-white">{asset.name}</div>
                           <div className="text-xs text-slate-500 mt-0.5">{typeInfo?.label} · {asset.role}</div>
@@ -391,8 +390,8 @@ export default function WealthPage() {
                         className="w-32 bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-white text-sm focus:outline-none focus:border-violet-500"
                       />
                       <div className="flex gap-2 ml-auto">
-                        <button onClick={() => openEditAsset(asset)} className="text-slate-500 hover:text-blue-400 text-xs transition-colors">✎ Editar</button>
-                        <button onClick={() => deleteAsset(asset.id)} className="text-slate-500 hover:text-red-400 text-xs transition-colors">✕ Eliminar</button>
+                        <button onClick={() => openEditAsset(asset)} className="text-slate-500 hover:text-blue-400 text-xs transition-colors">Editar</button>
+                        <button onClick={() => deleteAsset(asset.id)} className="text-slate-500 hover:text-red-400 text-xs transition-colors">Eliminar</button>
                       </div>
                     </div>
                   </div>
@@ -420,7 +419,7 @@ export default function WealthPage() {
               <div className="grid grid-cols-2 gap-3">
                 <input value={liabilityForm.name} onChange={e => setLiabilityForm(p => ({ ...p, name: e.target.value }))} placeholder="Nombre de la deuda" className="bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-violet-500 text-sm" />
                 <select value={liabilityForm.type} onChange={e => setLiabilityForm(p => ({ ...p, type: e.target.value }))} className="bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-violet-500 text-sm">
-                  {LIABILITY_TYPES.map(t => <option key={t.value} value={t.value}>{t.icon} {t.label}</option>)}
+                  {LIABILITY_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
                 </select>
               </div>
               <div className="grid grid-cols-3 gap-3">
@@ -439,9 +438,9 @@ export default function WealthPage() {
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <select value={liabilityForm.priority} onChange={e => setLiabilityForm(p => ({ ...p, priority: e.target.value }))} className="bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-violet-500 text-sm">
-                  <option value="high">🔴 Alta prioridad</option>
-                  <option value="medium">🟡 Media prioridad</option>
-                  <option value="low">🟢 Baja prioridad</option>
+                  <option value="high">Alta prioridad</option>
+                  <option value="medium">Media prioridad</option>
+                  <option value="low">Baja prioridad</option>
                 </select>
                 <input value={liabilityForm.strategy} onChange={e => setLiabilityForm(p => ({ ...p, strategy: e.target.value }))} placeholder="Estrategia (pagar primero, mínimo...)" className="bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-violet-500 text-sm" />
               </div>
@@ -453,7 +452,7 @@ export default function WealthPage() {
           )}
 
           {liabilities.length === 0 ? (
-            <div className="text-center py-12 text-slate-600"><div className="text-4xl mb-3">🎉</div><div className="text-slate-500">Sin pasivos registrados.</div></div>
+            <div className="text-center py-12 text-slate-600"><div className="text-slate-500">Sin pasivos registrados.</div></div>
           ) : (
             <div className="space-y-3">
               {sortedLiabilities.map(liability => {
@@ -464,7 +463,6 @@ export default function WealthPage() {
                   <div key={liability.id} className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
                     <div className="flex items-start justify-between gap-3 mb-3">
                       <div className="flex items-start gap-3">
-                        <span className="text-2xl">{typeInfo?.icon}</span>
                         <div>
                           <div className="font-semibold text-white">{liability.name}</div>
                           <div className="text-xs text-slate-500 mt-0.5">{typeInfo?.label}</div>
@@ -484,8 +482,8 @@ export default function WealthPage() {
                     </div>
 
                     <div className="flex gap-3">
-                      <button onClick={() => openEditLiability(liability)} className="text-slate-500 hover:text-blue-400 text-xs transition-colors">✎ Editar</button>
-                      <button onClick={() => deleteLiability(liability.id)} className="text-slate-500 hover:text-red-400 text-xs transition-colors">✕ Eliminar</button>
+                      <button onClick={() => openEditLiability(liability)} className="text-slate-500 hover:text-blue-400 text-xs transition-colors">Editar</button>
+                      <button onClick={() => deleteLiability(liability.id)} className="text-slate-500 hover:text-red-400 text-xs transition-colors">Eliminar</button>
                     </div>
                   </div>
                 );
@@ -503,7 +501,7 @@ export default function WealthPage() {
       {activeTab === "plan" && (
         <div className="space-y-4">
           <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
-            <h3 className="font-semibold text-white mb-4">🗺️ Plan de Eliminación de Deuda</h3>
+            <h3 className="font-semibold text-white mb-4">Plan de Eliminación de Deuda</h3>
             <p className="text-slate-400 text-sm mb-4">Prioridad por tasa de interés más alta primero (método avalancha).</p>
             {liabilities.length === 0 ? (
               <div className="text-slate-600 text-sm text-center py-6">Sin deudas registradas. ¡Excelente!</div>
@@ -521,12 +519,12 @@ export default function WealthPage() {
                           <div className="text-red-400 font-bold">${Number(l.balance).toLocaleString()}</div>
                         </div>
                         <div className="grid grid-cols-3 gap-2 mt-2 text-xs text-slate-500">
-                          <span>📈 Tasa: {l.interest_rate}%</span>
-                          <span>💳 Pago: ${Number(l.monthly_payment).toLocaleString()}/mes</span>
-                          {monthsLeft && <span>⏰ ~{monthsLeft} meses</span>}
+                          <span>Tasa: {l.interest_rate}%</span>
+                          <span>Pago: ${Number(l.monthly_payment).toLocaleString()}/mes</span>
+                          {monthsLeft && <span>~{monthsLeft} meses</span>}
                         </div>
                         {totalInterest && totalInterest > 0 && (
-                          <div className="text-xs text-red-400/70 mt-1">⚠️ Interés estimado total: ~${totalInterest.toLocaleString()}</div>
+                          <div className="text-xs text-red-400/70 mt-1">Interés estimado total: ~${totalInterest.toLocaleString()}</div>
                         )}
                         {idx === 0 && <div className="text-xs text-green-400 mt-1 font-medium">← Enfocar pagos extras aquí primero</div>}
                       </div>

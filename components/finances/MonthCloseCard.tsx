@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { X } from "lucide-react";
 
 // Cierre de mes: transfiere el balance (ingresos − egresos) del mes a uno o varios activos de Riqueza.
 // Cada mes se cierra una sola vez (unique user_id + month en month_closings).
@@ -124,7 +125,7 @@ export default function MonthCloseCard({ month, totalIncome, totalExpense }: { m
 
   if (tableMissing) return (
     <div className="bg-yellow-950/20 border border-yellow-500/30 rounded-2xl p-4 text-sm text-yellow-300">
-      🔒 El cierre de mes necesita la tabla <code>month_closings</code> en Supabase. Ejecuta <code>sql/2026-10-08_month_closings_and_dofa.sql</code> en el SQL Editor.
+      El cierre de mes necesita la tabla <code>month_closings</code> en Supabase. Ejecuta <code>sql/2026-10-08_month_closings_and_dofa.sql</code> en el SQL Editor.
     </div>
   );
 
@@ -132,9 +133,9 @@ export default function MonthCloseCard({ month, totalIncome, totalExpense }: { m
   if (closing) return (
     <div className="bg-slate-900 border border-green-500/30 rounded-2xl p-4 space-y-2">
       <div className="flex items-center justify-between flex-wrap gap-2">
-        <div className="text-sm text-white font-semibold">✅ Mes cerrado · {new Date(closing.closed_at).toLocaleDateString("es-CO")}</div>
+        <div className="text-sm text-white font-semibold">Mes cerrado · {new Date(closing.closed_at).toLocaleDateString("es-CO")}</div>
         {closable && !confirmReopen && (
-          <button onClick={() => setConfirmReopen(true)} className="text-xs text-slate-400 hover:text-white border border-slate-700 px-3 py-1.5 rounded-lg">↩ Reabrir</button>
+          <button onClick={() => setConfirmReopen(true)} className="text-xs text-slate-400 hover:text-white border border-slate-700 px-3 py-1.5 rounded-lg">Reabrir</button>
         )}
       </div>
       <div className="text-xs text-slate-400">
@@ -143,7 +144,7 @@ export default function MonthCloseCard({ month, totalIncome, totalExpense }: { m
       </div>
       {Math.abs(Number(closing.balance) - balance) > 0.009 && (
         <div className="text-xs text-yellow-400">
-          ⚠️ El balance cambió desde el cierre (ahora {balance >= 0 ? "+" : "-"}{money(balance)}). Reabre y vuelve a cerrar el mes para ajustar Riqueza.
+          El balance cambió desde el cierre (ahora {balance >= 0 ? "+" : "-"}{money(balance)}). Reabre y vuelve a cerrar el mes para ajustar Riqueza.
         </div>
       )}
       {confirmReopen && (
@@ -162,7 +163,7 @@ export default function MonthCloseCard({ month, totalIncome, totalExpense }: { m
     <div className="bg-slate-900 border border-violet-500/30 rounded-2xl p-4 space-y-3">
       <div className="flex items-center justify-between flex-wrap gap-2">
         <div>
-          <div className="text-sm text-white font-semibold">🔐 Cierre de mes</div>
+          <div className="text-sm text-white font-semibold">Cierre de mes</div>
           <div className="text-xs text-slate-400 mt-0.5">
             {balance > 0 ? `Te sobraron ${money(balance)}: asígnalos a tus activos en Riqueza.`
               : balance < 0 ? `Gastaste ${money(balance)} más de lo que ingresó: indica de qué activo salió.`
@@ -196,7 +197,7 @@ export default function MonthCloseCard({ month, totalIncome, totalExpense }: { m
                   onChange={e => setRows(p => p.map((r, j) => j === i ? { ...r, amount: e.target.value } : r))}
                   className="w-28 bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-violet-500" />
                 {rows.length > 1 && (
-                  <button onClick={() => setRows(p => p.filter((_, j) => j !== i))} className="text-slate-500 hover:text-red-400 text-xs px-1">✕</button>
+                  <button onClick={() => setRows(p => p.filter((_, j) => j !== i))} className="text-slate-500 hover:text-red-400 text-xs px-1"><X size={14} /></button>
                 )}
               </div>
             ))}
@@ -204,7 +205,7 @@ export default function MonthCloseCard({ month, totalIncome, totalExpense }: { m
               <button onClick={() => setRows(p => [...p, { asset_id: assets[0].id, amount: String(Math.max(remaining, 0)) }])}
                 className="text-xs text-violet-400 hover:text-violet-300">+ Repartir en otro activo</button>
               <span className={`text-xs ${Math.abs(remaining) > 0.009 ? "text-yellow-400" : "text-green-400"}`}>
-                {Math.abs(remaining) > 0.009 ? `Sin asignar: ${remaining < 0 ? "-" : ""}${money(remaining)}` : "✓ Todo asignado"}
+                {Math.abs(remaining) > 0.009 ? `Sin asignar: ${remaining < 0 ? "-" : ""}${money(remaining)}` : "Todo asignado"}
               </span>
             </div>
             <div className="text-xs text-slate-500">

@@ -96,7 +96,7 @@ Estado actual: **Next.js en Vercel + Supabase** (Postgres, Auth, pg_cron) + Gemi
 
 | Fecha | ID | Qué | Commit |
 |---|---|---|---|
-| 2026-11-06 | — | Fechas en UTC: hábitos y finanzas registraban el día siguiente después de las 6–7 pm (América). Nuevo `lib/dates.ts`. | pendiente de commit |
-| 2026-11-06 | — | La PWA no tenía íconos (`public/icons/` vacío); ahora 192/512/maskable/apple-touch/favicon. | pendiente de commit |
+| 2026-11-06 | — | Fechas en UTC: hábitos y finanzas registraban el día siguiente después de las 6–7 pm (América). Nuevo `lib/dates.ts`. | `0d917be` |
+| 2026-11-06 | — | La PWA no tenía íconos (`public/icons/` vacío); ahora 192/512/maskable/apple-touch/favicon. | `0d917be` |
 | 2026-10-08 | — | Estrategias DOFA (FO/DO/FA/DA) no se podían guardar (enum). | `29b91b0` |
 | 2026-10-08 | — | Hábitos mensuales mostrados como "Semanal"; falta categoría "Viajes". | `f0bbd14` |

@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <path fill="#000" fill-rule="evenodd" d="M128 64a84 84 0 1 1 0 168a84 84 0 1 1 0-168zM128 88a60 60 0 1 0 0 120a60 60 0 1 0 0-120z"/>
+  <path fill="#000" d="M88 80C100 48 130 26 164 18C154 36 152 56 160 80Z"/>
+</svg>

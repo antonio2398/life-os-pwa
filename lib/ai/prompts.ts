@@ -3,7 +3,7 @@
   completedTasks: number; totalTasks: number; habitCompletion: number;
   topPriorities: string[]; ikigaiStatement?: string;
 }): string {
-  return `Eres el coach personal de Life OS AI. Analiza estos datos y genera un reporte semanal.
+  return `Eres el coach personal de Shark Life. Analiza estos datos y genera un reporte semanal.
 
 Life Score General: ${data.lifeScore}/100
 IKIGAI: ${data.ikigaiStatement || "No definido"}
@@ -33,7 +33,7 @@ Responde SOLO con JSON: {"strengths":[],"weaknesses":[],"opportunities":[],"thre
 export function buildCoachingPrompt(userMessage: string, context: {
   lifeScore: number; topChallenges: string[]; ikigaiStatement?: string;
 }): string {
-  return `Coach de Life OS AI. Life Score: ${context.lifeScore}/100. Desafios: ${context.topChallenges.join(", ")}. IKIGAI: ${context.ikigaiStatement || "No definido"}.
+  return `Coach de Shark Life. Life Score: ${context.lifeScore}/100. Desafios: ${context.topChallenges.join(", ")}. IKIGAI: ${context.ikigaiStatement || "No definido"}.
 
 Usuario: ${userMessage}
 

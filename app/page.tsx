@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { SharkSymbol } from "@/components/brand/SharkLogo";
 
 export default function HomePage() {
   const router = useRouter();
@@ -25,10 +26,10 @@ export default function HomePage() {
   }, [router, supabase]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-950">
+    <div className="min-h-screen flex items-center justify-center">
       <div className="text-white text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-violet-600 mx-auto mb-4"></div>
-        <p className="text-slate-400">Cargando Life OS AI...</p>
+        <SharkSymbol size={56} className="mx-auto mb-4 animate-pulse" />
+        <p className="text-ocean-400">Cargando Shark Life...</p>
       </div>
     </div>
   );

@@ -1,8 +1,9 @@
-﻿"use client";
+"use client";
 import { useEffect, useState, useRef, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
 import MonthCloseCard from "@/components/finances/MonthCloseCard";
 import { Pencil, X } from "lucide-react";
+import { toLocalDate, toLocalMonth } from "@/lib/dates";
 
 const CURRENCIES = [
   { code: "USD", name: "Dólar USD" },
@@ -40,7 +41,7 @@ interface MetricSnapshot {
 
 type Tab = "overview" | "incomes" | "expenses" | "budget" | "history";
 
-function getCurrentMonth() { return new Date().toISOString().slice(0, 7); }
+function getCurrentMonth() { return toLocalMonth(); }
 
 // ── Currency Converter ────────────────────────────────────────────────────────
 function CurrencyConverter({ amount, fromCurrency, onApply }: {
@@ -75,22 +76,22 @@ function CurrencyConverter({ amount, fromCurrency, onApply }: {
   }, [amount, fromCurrency, to, convert]);
 
   return (
-    <div className="bg-slate-800/60 border border-slate-700/60 rounded-xl p-4 space-y-3">
+    <div className="bg-ocean-800/60 border border-ocean-700/60 rounded-xl p-4 space-y-3">
       <div className="flex items-center justify-between">
-        <div className="text-xs font-medium text-slate-400">Conversor de divisas</div>
-        <div className="text-xs text-slate-600">Tiempo real · ExchangeRate-API</div>
+        <div className="text-xs font-medium text-ocean-400">Conversor de divisas</div>
+        <div className="text-xs text-ocean-600">Tiempo real · ExchangeRate-API</div>
       </div>
       <div className="flex items-center gap-2">
-        <div className="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-center">
-          <div className="text-xs text-slate-500 mb-0.5">Desde</div>
+        <div className="flex-1 bg-ocean-900 border border-ocean-700 rounded-lg px-3 py-2 text-center">
+          <div className="text-xs text-ocean-500 mb-0.5">Desde</div>
           <div className="text-white font-bold text-sm">{fromCurrency}</div>
           <div className="text-green-400 font-mono text-sm">{amount > 0 ? amount.toLocaleString("es-CO", { minimumFractionDigits: 2 }) : "—"}</div>
         </div>
-        <div className="text-slate-500 text-lg shrink-0">→</div>
+        <div className="text-ocean-500 text-lg shrink-0">→</div>
         <div className="flex-1">
-          <div className="text-xs text-slate-500 mb-1 text-center">Hacia</div>
+          <div className="text-xs text-ocean-500 mb-1 text-center">Hacia</div>
           <select value={to} onChange={e => setTo(e.target.value)}
-            className="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-2 text-white text-sm focus:outline-none focus:border-violet-500">
+            className="w-full bg-ocean-900 border border-ocean-700 rounded-lg px-2 py-2 text-white text-sm focus:outline-none focus:border-brand-500">
             {CURRENCIES.filter(c => c.code !== fromCurrency).map(c => (
               <option key={c.code} value={c.code}>{c.code} — {c.name}</option>
             ))}
@@ -98,18 +99,18 @@ function CurrencyConverter({ amount, fromCurrency, onApply }: {
         </div>
       </div>
       {loading && (
-        <div className="text-center text-slate-400 text-sm py-2 flex items-center justify-center gap-2">
-          <span className="w-3 h-3 border-2 border-violet-500/30 border-t-violet-500 rounded-full animate-spin" />
+        <div className="text-center text-ocean-400 text-sm py-2 flex items-center justify-center gap-2">
+          <span className="w-3 h-3 border-2 border-brand-500/30 border-t-brand-500 rounded-full animate-spin" />
           Consultando tasas...
         </div>
       )}
       {error && <div className="text-red-400 text-xs text-center py-1">{error}</div>}
       {result && !loading && (
-        <div className="bg-slate-900/80 rounded-xl p-3 text-center space-y-1">
+        <div className="bg-ocean-900/80 rounded-xl p-3 text-center space-y-1">
           <div className="text-2xl font-black text-green-400">{result.formatted.converted}</div>
-          <div className="text-xs text-slate-500">1 {fromCurrency} = {result.rate.toLocaleString("es-CO", { minimumFractionDigits: 2, maximumFractionDigits: 6 })} {to}</div>
+          <div className="text-xs text-ocean-500">1 {fromCurrency} = {result.rate.toLocaleString("es-CO", { minimumFractionDigits: 2, maximumFractionDigits: 6 })} {to}</div>
           <button onClick={() => onApply(result.converted, to)}
-            className="mt-2 bg-violet-600 hover:bg-violet-700 text-white text-xs px-4 py-1.5 rounded-lg transition-colors font-medium">
+            className="mt-2 bg-brand-600 hover:bg-brand-700 text-white text-xs px-4 py-1.5 rounded-lg transition-colors font-medium">
             Usar {result.formatted.converted} como monto
           </button>
         </div>
@@ -136,7 +137,7 @@ export default function FinancesPage() {
   const [incomeCurrency, setIncomeCurrency] = useState("USD");
   const [incomeForm, setIncomeForm] = useState({
     category: "Salario", description: "", amount: "",
-    date: new Date().toISOString().split("T")[0], notes: "",
+    date: toLocalDate(), notes: "",
   });
 
   // Expense form
@@ -147,7 +148,7 @@ export default function FinancesPage() {
   const [expenseCurrency, setExpenseCurrency] = useState("USD");
   const [expenseForm, setExpenseForm] = useState({
     category: "Alimentación", description: "", amount: "",
-    date: new Date().toISOString().split("T")[0], is_debt: false, notes: "",
+    date: toLocalDate(), is_debt: false, notes: "",
   });
 
   // Budget form
@@ -166,7 +167,7 @@ export default function FinancesPage() {
 
     const monthStart = `${selectedMonth}-01`;
     const [y, m] = selectedMonth.split("-").map(Number);
-    const monthEnd = new Date(y, m, 0).toISOString().split("T")[0];
+    const monthEnd = toLocalDate(new Date(y, m, 0));
 
     const [{ data: i }, { data: e }, { data: b }, { data: h }] = await Promise.all([
       supabase.from("incomes").select("*").eq("user_id", user.id).gte("date", monthStart).lte("date", monthEnd).order("date", { ascending: false }),
@@ -187,7 +188,7 @@ export default function FinancesPage() {
     if (!user) return;
     const d = new Date();
     d.setDate(d.getDate() - ((d.getDay() || 7) - 1));
-    const weekStart = d.toISOString().split("T")[0];
+    const weekStart = toLocalDate(d);
     await supabase.from("weekly_scorecards").upsert({
       user_id: user.id, week_start: weekStart, life_score: 0,
       metrics: { total_income: totalIncome, total_expense: totalExpense, balance, savings_rate: savingsRate, burn_rate: burnRate, month: selectedMonth },
@@ -220,7 +221,7 @@ export default function FinancesPage() {
   function resetIncomeForm() {
     setShowIncomeForm(false); setEditingIncomeId(null);
     setShowIncomeConverter(false); setIncomeCurrency("USD");
-    setIncomeForm({ category: "Salario", description: "", amount: "", date: new Date().toISOString().split("T")[0], notes: "" });
+    setIncomeForm({ category: "Salario", description: "", amount: "", date: toLocalDate(), notes: "" });
   }
 
   function openEditIncome(income: Income) {
@@ -258,7 +259,7 @@ export default function FinancesPage() {
   function resetExpenseForm() {
     setShowExpenseForm(false); setEditingExpenseId(null);
     setShowExpenseConverter(false); setExpenseCurrency("USD");
-    setExpenseForm({ category: "Alimentación", description: "", amount: "", date: new Date().toISOString().split("T")[0], is_debt: false, notes: "" });
+    setExpenseForm({ category: "Alimentación", description: "", amount: "", date: toLocalDate(), is_debt: false, notes: "" });
   }
 
   function openEditExpense(expense: Expense) {
@@ -310,7 +311,7 @@ export default function FinancesPage() {
 
   const barColor = (pct: number) => pct >= 100 ? "bg-red-500" : pct >= 80 ? "bg-yellow-500" : "bg-green-500";
 
-  if (loading) return <div className="flex items-center justify-center h-64"><div className="text-slate-400">Cargando finanzas...</div></div>;
+  if (loading) return <div className="flex items-center justify-center h-64"><div className="text-ocean-400">Cargando finanzas...</div></div>;
 
   return (
     <div className="space-y-6">
@@ -319,10 +320,10 @@ export default function FinancesPage() {
       <div className="flex items-start justify-between flex-wrap gap-3">
         <div>
           <h2 className="text-2xl font-bold text-white">Finanzas</h2>
-          <p className="text-slate-400 text-sm mt-1">Control de flujo de caja mensual</p>
+          <p className="text-ocean-400 text-sm mt-1">Control de flujo de caja mensual</p>
         </div>
         <input type="month" value={selectedMonth} onChange={e => setSelectedMonth(e.target.value)}
-          className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-violet-500" />
+          className="bg-ocean-900 border border-ocean-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-brand-500" />
       </div>
 
       {/* KPIs principales */}
@@ -330,10 +331,10 @@ export default function FinancesPage() {
         {[
           { label: "Ingresos", value: totalIncome,  color: "text-green-400" },
           { label: "Egresos",  value: totalExpense, color: "text-red-400" },
-          { label: "Balance",  value: balance,      color: balance >= 0 ? "text-blue-400" : "text-red-400", prefix: balance < 0 ? "-" : "" },
+          { label: "Balance",  value: balance,      color: balance >= 0 ? "text-brand-300" : "text-red-400", prefix: balance < 0 ? "-" : "" },
         ].map(kpi => (
-          <div key={kpi.label} className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
-            <div className="text-xs text-slate-500 mb-2">{kpi.label}</div>
+          <div key={kpi.label} className="bg-ocean-900 border border-ocean-800 rounded-2xl p-5">
+            <div className="text-xs text-ocean-500 mb-2">{kpi.label}</div>
             <div className={`text-2xl font-black tabular-nums ${kpi.color}`}>
               {kpi.prefix ?? ""}${Math.abs(kpi.value).toLocaleString("es-CO", { minimumFractionDigits: 2 })}
             </div>
@@ -342,24 +343,24 @@ export default function FinancesPage() {
       </div>
 
       <div className="grid grid-cols-3 gap-4">
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 text-center">
-          <div className="text-xs text-slate-500 mb-1">Savings Rate</div>
+        <div className="bg-ocean-900 border border-ocean-800 rounded-xl p-4 text-center">
+          <div className="text-xs text-ocean-500 mb-1">Savings Rate</div>
           <div className={`text-2xl font-black ${savingsRate >= 20 ? "text-green-400" : savingsRate >= 10 ? "text-yellow-400" : "text-red-400"}`}>{savingsRate}%</div>
         </div>
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 text-center">
-          <div className="text-xs text-slate-500 mb-1">Burn Rate</div>
+        <div className="bg-ocean-900 border border-ocean-800 rounded-xl p-4 text-center">
+          <div className="text-xs text-ocean-500 mb-1">Burn Rate</div>
           <div className="text-2xl font-black text-orange-400">${burnRate.toLocaleString()}</div>
         </div>
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 text-center">
-          <div className="text-xs text-slate-500 mb-1">Transacciones</div>
-          <div className="text-2xl font-black text-slate-300">{incomes.length + expenses.length}</div>
+        <div className="bg-ocean-900 border border-ocean-800 rounded-xl p-4 text-center">
+          <div className="text-xs text-ocean-500 mb-1">Transacciones</div>
+          <div className="text-2xl font-black text-ocean-300">{incomes.length + expenses.length}</div>
         </div>
       </div>
 
       <MonthCloseCard month={selectedMonth} totalIncome={totalIncome} totalExpense={totalExpense} />
 
       {/* TABS */}
-      <div className="flex gap-1 bg-slate-900 border border-slate-800 rounded-xl p-1 overflow-x-auto">
+      <div className="flex gap-1 bg-ocean-900 border border-ocean-800 rounded-xl p-1 overflow-x-auto">
         {([
           ["overview",  "Resumen"],
           ["incomes",   `Ingresos (${incomes.length})`],
@@ -369,7 +370,7 @@ export default function FinancesPage() {
         ] as [Tab, string][]).map(([tab, label]) => (
           <button key={tab} onClick={() => setActiveTab(tab)}
             className={`flex-1 py-2 text-xs font-medium rounded-lg transition-colors whitespace-nowrap ${
-              activeTab === tab ? "bg-violet-600 text-white" : "text-slate-400 hover:text-white"
+              activeTab === tab ? "bg-brand-600 text-white" : "text-ocean-400 hover:text-white"
             }`}>{label}</button>
         ))}
       </div>
@@ -380,16 +381,16 @@ export default function FinancesPage() {
           <div className="flex justify-between items-center">
             <h3 className="text-base font-semibold text-white">Gastos por categoría</h3>
             <button onClick={saveMetricSnapshot}
-              className="text-xs text-violet-400 border border-violet-500/40 px-3 py-1.5 rounded-lg hover:bg-violet-900/20 transition-colors">
+              className="text-xs text-brand-400 border border-brand-500/40 px-3 py-1.5 rounded-lg hover:bg-brand-900/20 transition-colors">
               Guardar snapshot
             </button>
           </div>
           {expByCategory.length === 0 ? (
-            <div className="text-center py-10 text-slate-600">Sin movimientos este mes</div>
+            <div className="text-center py-10 text-ocean-600">Sin movimientos este mes</div>
           ) : (
             <div className="space-y-2">
               {expByCategory.sort((a, b) => b.spent - a.spent).map(cat => (
-                <div key={cat.name} className="bg-slate-900 border border-slate-800 rounded-xl p-4">
+                <div key={cat.name} className="bg-ocean-900 border border-ocean-800 rounded-xl p-4">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
                       
@@ -406,10 +407,10 @@ export default function FinancesPage() {
                   </div>
                   {cat.limit > 0 && (
                     <>
-                      <div className="h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                      <div className="h-1.5 bg-ocean-800 rounded-full overflow-hidden">
                         <div className={`h-full rounded-full ${barColor(cat.pct)}`} style={{ width: `${Math.min(cat.pct, 100)}%` }} />
                       </div>
-                      <div className="flex justify-between text-xs text-slate-600 mt-1">
+                      <div className="flex justify-between text-xs text-ocean-600 mt-1">
                         <span>Presupuesto: ${cat.limit.toLocaleString()}</span>
                         <span>Disponible: ${Math.max(cat.limit - cat.spent, 0).toLocaleString()}</span>
                       </div>
@@ -427,34 +428,34 @@ export default function FinancesPage() {
         <div className="space-y-4">
           <div className="flex justify-end">
             <button onClick={() => { resetIncomeForm(); setShowIncomeForm(true); }}
-              className="bg-violet-600 hover:bg-violet-700 text-white text-sm px-4 py-2 rounded-lg">+ Nuevo Ingreso</button>
+              className="bg-brand-600 hover:bg-brand-700 text-white text-sm px-4 py-2 rounded-lg">+ Nuevo Ingreso</button>
           </div>
 
           {showIncomeForm && (
-            <div className="bg-slate-900 border border-violet-500/40 rounded-2xl p-5 space-y-4">
+            <div className="bg-ocean-900 border border-brand-500/40 rounded-2xl p-5 space-y-4">
               <div className="text-sm font-semibold text-white">{editingIncomeId ? "Editar ingreso" : "Nuevo ingreso"}</div>
               <div className="grid grid-cols-2 gap-3">
                 <input value={incomeForm.description} onChange={e => setIncomeForm(p => ({ ...p, description: e.target.value }))}
-                  placeholder="Descripción" className="bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-violet-500 text-sm" />
+                  placeholder="Descripción" className="bg-ocean-800 border border-ocean-700 rounded-lg px-4 py-2.5 text-white placeholder-ocean-500 focus:outline-none focus:border-brand-500 text-sm" />
                 <select value={incomeForm.category} onChange={e => setIncomeForm(p => ({ ...p, category: e.target.value }))}
-                  className="bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-violet-500 text-sm">
+                  className="bg-ocean-800 border border-ocean-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-brand-500 text-sm">
                   {INCOME_CATEGORIES.map(c => <option key={c}>{c}</option>)}
                 </select>
               </div>
               <div className="flex gap-2">
                 <input type="number" step="0.01" value={incomeForm.amount}
                   onChange={e => setIncomeForm(p => ({ ...p, amount: e.target.value }))}
-                  placeholder="Monto" className="flex-1 bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-violet-500 text-sm" />
+                  placeholder="Monto" className="flex-1 bg-ocean-800 border border-ocean-700 rounded-lg px-4 py-2.5 text-white placeholder-ocean-500 focus:outline-none focus:border-brand-500 text-sm" />
                 <select value={incomeCurrency} onChange={e => setIncomeCurrency(e.target.value)}
-                  className="w-32 bg-slate-800 border border-slate-700 rounded-lg px-2 py-2.5 text-white focus:outline-none focus:border-violet-500 text-sm">
+                  className="w-32 bg-ocean-800 border border-ocean-700 rounded-lg px-2 py-2.5 text-white focus:outline-none focus:border-brand-500 text-sm">
                   {CURRENCIES.map(c => <option key={c.code} value={c.code}>{c.code}</option>)}
                 </select>
                 <input type="date" value={incomeForm.date} onChange={e => setIncomeForm(p => ({ ...p, date: e.target.value }))}
-                  className="bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-violet-500 text-sm" />
+                  className="bg-ocean-800 border border-ocean-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-brand-500 text-sm" />
               </div>
 
               <button onClick={() => setShowIncomeConverter(p => !p)}
-                className="text-xs text-violet-400 hover:text-violet-300 transition-colors">
+                className="text-xs text-brand-400 hover:text-brand-300 transition-colors">
                 {showIncomeConverter ? "Ocultar conversor" : "Convertir a otra divisa"}
               </button>
               {showIncomeConverter && (
@@ -471,39 +472,39 @@ export default function FinancesPage() {
 
               <textarea value={incomeForm.notes} onChange={e => setIncomeForm(p => ({ ...p, notes: e.target.value }))}
                 placeholder="Notas (opcional)" rows={1}
-                className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-violet-500 resize-none text-sm" />
+                className="w-full bg-ocean-800 border border-ocean-700 rounded-lg px-4 py-2 text-white placeholder-ocean-500 focus:outline-none focus:border-brand-500 resize-none text-sm" />
               <div className="flex gap-2">
                 <button onClick={saveIncome} disabled={savingIncome}
-                  className="bg-violet-600 hover:bg-violet-700 disabled:opacity-50 text-white text-sm px-5 py-2 rounded-lg font-medium">
+                  className="bg-brand-600 hover:bg-brand-700 disabled:opacity-50 text-white text-sm px-5 py-2 rounded-lg font-medium">
                   {savingIncome ? "Guardando..." : "Guardar"}
                 </button>
-                <button onClick={resetIncomeForm} className="text-slate-400 hover:text-white text-sm px-4 py-2 rounded-lg border border-slate-700">Cancelar</button>
+                <button onClick={resetIncomeForm} className="text-ocean-400 hover:text-white text-sm px-4 py-2 rounded-lg border border-ocean-700">Cancelar</button>
               </div>
             </div>
           )}
 
           {incomes.length === 0 ? (
-            <div className="text-center py-10 text-slate-600">Sin ingresos este mes</div>
+            <div className="text-center py-10 text-ocean-600">Sin ingresos este mes</div>
           ) : (
             <div className="space-y-2">
               {incomes.map(income => (
-                <div key={income.id} className="group flex items-center justify-between bg-slate-900 border border-slate-800 rounded-xl px-4 py-3">
+                <div key={income.id} className="group flex items-center justify-between bg-ocean-900 border border-ocean-800 rounded-xl px-4 py-3">
                   <div>
                     <div className="text-sm text-white font-medium">{income.description}</div>
-                    <div className="text-xs text-slate-500">{income.category} · {income.date}</div>
-                    {income.notes && <div className="text-xs text-slate-600 italic">{income.notes}</div>}
+                    <div className="text-xs text-ocean-500">{income.category} · {income.date}</div>
+                    {income.notes && <div className="text-xs text-ocean-600 italic">{income.notes}</div>}
                   </div>
                   <div className="flex items-center gap-3">
                     <div className="text-green-400 font-bold">+${Number(income.amount).toLocaleString("es-CO", { minimumFractionDigits: 2 })}</div>
                     <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button onClick={() => openEditIncome(income)} className="text-slate-500 hover:text-blue-400 text-xs"><Pencil size={14} /></button>
-                      <button onClick={() => deleteIncome(income.id)} className="text-slate-500 hover:text-red-400 text-xs"><X size={14} /></button>
+                      <button onClick={() => openEditIncome(income)} className="text-ocean-500 hover:text-blue-400 text-xs"><Pencil size={14} /></button>
+                      <button onClick={() => deleteIncome(income.id)} className="text-ocean-500 hover:text-red-400 text-xs"><X size={14} /></button>
                     </div>
                   </div>
                 </div>
               ))}
-              <div className="flex justify-between text-sm font-semibold px-4 py-2.5 bg-slate-900 border border-green-500/20 rounded-xl">
-                <span className="text-slate-400">Total ingresos</span>
+              <div className="flex justify-between text-sm font-semibold px-4 py-2.5 bg-ocean-900 border border-green-500/20 rounded-xl">
+                <span className="text-ocean-400">Total ingresos</span>
                 <span className="text-green-400">+${totalIncome.toLocaleString("es-CO", { minimumFractionDigits: 2 })}</span>
               </div>
             </div>
@@ -516,34 +517,34 @@ export default function FinancesPage() {
         <div className="space-y-4">
           <div className="flex justify-end">
             <button onClick={() => { resetExpenseForm(); setShowExpenseForm(true); }}
-              className="bg-violet-600 hover:bg-violet-700 text-white text-sm px-4 py-2 rounded-lg">+ Nuevo Egreso</button>
+              className="bg-brand-600 hover:bg-brand-700 text-white text-sm px-4 py-2 rounded-lg">+ Nuevo Egreso</button>
           </div>
 
           {showExpenseForm && (
-            <div className="bg-slate-900 border border-violet-500/40 rounded-2xl p-5 space-y-4">
+            <div className="bg-ocean-900 border border-brand-500/40 rounded-2xl p-5 space-y-4">
               <div className="text-sm font-semibold text-white">{editingExpenseId ? "Editar egreso" : "Nuevo egreso"}</div>
               <div className="grid grid-cols-2 gap-3">
                 <input value={expenseForm.description} onChange={e => setExpenseForm(p => ({ ...p, description: e.target.value }))}
-                  placeholder="Descripción" className="bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-violet-500 text-sm" />
+                  placeholder="Descripción" className="bg-ocean-800 border border-ocean-700 rounded-lg px-4 py-2.5 text-white placeholder-ocean-500 focus:outline-none focus:border-brand-500 text-sm" />
                 <select value={expenseForm.category} onChange={e => setExpenseForm(p => ({ ...p, category: e.target.value }))}
-                  className="bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-violet-500 text-sm">
+                  className="bg-ocean-800 border border-ocean-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-brand-500 text-sm">
                   {EXPENSE_CATEGORIES.map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
                 </select>
               </div>
               <div className="flex gap-2">
                 <input type="number" step="0.01" value={expenseForm.amount}
                   onChange={e => setExpenseForm(p => ({ ...p, amount: e.target.value }))}
-                  placeholder="Monto" className="flex-1 bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-violet-500 text-sm" />
+                  placeholder="Monto" className="flex-1 bg-ocean-800 border border-ocean-700 rounded-lg px-4 py-2.5 text-white placeholder-ocean-500 focus:outline-none focus:border-brand-500 text-sm" />
                 <select value={expenseCurrency} onChange={e => setExpenseCurrency(e.target.value)}
-                  className="w-32 bg-slate-800 border border-slate-700 rounded-lg px-2 py-2.5 text-white focus:outline-none focus:border-violet-500 text-sm">
+                  className="w-32 bg-ocean-800 border border-ocean-700 rounded-lg px-2 py-2.5 text-white focus:outline-none focus:border-brand-500 text-sm">
                   {CURRENCIES.map(c => <option key={c.code} value={c.code}>{c.code}</option>)}
                 </select>
                 <input type="date" value={expenseForm.date} onChange={e => setExpenseForm(p => ({ ...p, date: e.target.value }))}
-                  className="bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-violet-500 text-sm" />
+                  className="bg-ocean-800 border border-ocean-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-brand-500 text-sm" />
               </div>
 
               <button onClick={() => setShowExpenseConverter(p => !p)}
-                className="text-xs text-violet-400 hover:text-violet-300 transition-colors">
+                className="text-xs text-brand-400 hover:text-brand-300 transition-colors">
                 {showExpenseConverter ? "Ocultar conversor" : "Convertir a otra divisa"}
               </button>
               {showExpenseConverter && (
@@ -559,51 +560,51 @@ export default function FinancesPage() {
               )}
 
               <label className="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" checked={expenseForm.is_debt} onChange={e => setExpenseForm(p => ({ ...p, is_debt: e.target.checked }))} className="accent-violet-500" />
-                <span className="text-sm text-slate-400">¿Es deuda / pago de crédito?</span>
+                <input type="checkbox" checked={expenseForm.is_debt} onChange={e => setExpenseForm(p => ({ ...p, is_debt: e.target.checked }))} className="accent-brand-500" />
+                <span className="text-sm text-ocean-400">¿Es deuda / pago de crédito?</span>
               </label>
               <textarea value={expenseForm.notes} onChange={e => setExpenseForm(p => ({ ...p, notes: e.target.value }))}
                 placeholder="Notas (opcional)" rows={1}
-                className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-violet-500 resize-none text-sm" />
+                className="w-full bg-ocean-800 border border-ocean-700 rounded-lg px-4 py-2 text-white placeholder-ocean-500 focus:outline-none focus:border-brand-500 resize-none text-sm" />
               <div className="flex gap-2">
                 <button onClick={saveExpense} disabled={savingExpense}
-                  className="bg-violet-600 hover:bg-violet-700 disabled:opacity-50 text-white text-sm px-5 py-2 rounded-lg font-medium">
+                  className="bg-brand-600 hover:bg-brand-700 disabled:opacity-50 text-white text-sm px-5 py-2 rounded-lg font-medium">
                   {savingExpense ? "Guardando..." : "Guardar"}
                 </button>
-                <button onClick={resetExpenseForm} className="text-slate-400 hover:text-white text-sm px-4 py-2 rounded-lg border border-slate-700">Cancelar</button>
+                <button onClick={resetExpenseForm} className="text-ocean-400 hover:text-white text-sm px-4 py-2 rounded-lg border border-ocean-700">Cancelar</button>
               </div>
             </div>
           )}
 
           {expenses.length === 0 ? (
-            <div className="text-center py-10 text-slate-600">Sin egresos este mes</div>
+            <div className="text-center py-10 text-ocean-600">Sin egresos este mes</div>
           ) : (
             <div className="space-y-2">
               {expenses.map(expense => {
                 const cat = EXPENSE_CATEGORIES.find(c => c.name === expense.category);
                 return (
-                  <div key={expense.id} className="group flex items-center justify-between bg-slate-900 border border-slate-800 rounded-xl px-4 py-3">
+                  <div key={expense.id} className="group flex items-center justify-between bg-ocean-900 border border-ocean-800 rounded-xl px-4 py-3">
                     <div>
                       <div className="flex items-center gap-2">
                         
                         <span className="text-sm text-white font-medium">{expense.description}</span>
                         {expense.is_debt && <span className="text-xs text-orange-400 bg-orange-900/30 border border-orange-500/30 px-1.5 py-0.5 rounded-full">Deuda</span>}
                       </div>
-                      <div className="text-xs text-slate-500">{expense.category} · {expense.date}</div>
-                      {expense.notes && <div className="text-xs text-slate-600 italic">{expense.notes}</div>}
+                      <div className="text-xs text-ocean-500">{expense.category} · {expense.date}</div>
+                      {expense.notes && <div className="text-xs text-ocean-600 italic">{expense.notes}</div>}
                     </div>
                     <div className="flex items-center gap-3">
                       <div className="text-red-400 font-bold">-${Number(expense.amount).toLocaleString("es-CO", { minimumFractionDigits: 2 })}</div>
                       <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button onClick={() => openEditExpense(expense)} className="text-slate-500 hover:text-blue-400 text-xs"><Pencil size={14} /></button>
-                        <button onClick={() => deleteExpense(expense.id)} className="text-slate-500 hover:text-red-400 text-xs"><X size={14} /></button>
+                        <button onClick={() => openEditExpense(expense)} className="text-ocean-500 hover:text-blue-400 text-xs"><Pencil size={14} /></button>
+                        <button onClick={() => deleteExpense(expense.id)} className="text-ocean-500 hover:text-red-400 text-xs"><X size={14} /></button>
                       </div>
                     </div>
                   </div>
                 );
               })}
-              <div className="flex justify-between text-sm font-semibold px-4 py-2.5 bg-slate-900 border border-red-500/20 rounded-xl">
-                <span className="text-slate-400">Total egresos</span>
+              <div className="flex justify-between text-sm font-semibold px-4 py-2.5 bg-ocean-900 border border-red-500/20 rounded-xl">
+                <span className="text-ocean-400">Total egresos</span>
                 <span className="text-red-400">-${totalExpense.toLocaleString("es-CO", { minimumFractionDigits: 2 })}</span>
               </div>
             </div>
@@ -619,11 +620,11 @@ export default function FinancesPage() {
           <div className={`rounded-2xl p-5 border ${balance >= 0 ? "bg-green-950/20 border-green-500/30" : "bg-red-950/20 border-red-500/30"}`}>
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-xs text-slate-400 uppercase tracking-widest mb-1">Balance del mes · {selectedMonth}</div>
+                <div className="text-xs text-ocean-400 uppercase tracking-widest mb-1">Balance del mes · {selectedMonth}</div>
                 <div className={`text-4xl font-black tabular-nums ${balance >= 0 ? "text-green-400" : "text-red-400"}`}>
                   {balance >= 0 ? "+" : "-"}${Math.abs(balance).toLocaleString("es-CO", { minimumFractionDigits: 2 })}
                 </div>
-                <div className="text-xs text-slate-500 mt-1">
+                <div className="text-xs text-ocean-500 mt-1">
                   Ingresos ${totalIncome.toLocaleString()} − Egresos ${totalExpense.toLocaleString()}
                 </div>
               </div>
@@ -633,11 +634,11 @@ export default function FinancesPage() {
 
           {/* Distribución de egresos vs balance */}
           {expenses.length === 0 ? (
-            <div className="text-center py-10 text-slate-600">Sin egresos este mes para analizar</div>
+            <div className="text-center py-10 text-ocean-600">Sin egresos este mes para analizar</div>
           ) : (
             <div className="space-y-3">
               <div className="text-sm font-semibold text-white">Distribución de egresos</div>
-              <p className="text-xs text-slate-500">Cada categoría muestra qué % representa del total de ingresos.</p>
+              <p className="text-xs text-ocean-500">Cada categoría muestra qué % representa del total de ingresos.</p>
 
               {EXPENSE_CATEGORIES.map(cat => {
                 const spent = expenses
@@ -658,7 +659,7 @@ export default function FinancesPage() {
                 const barW = pctOfExpense;
 
                 return (
-                  <div key={cat.name} className="bg-slate-900 border border-slate-800 rounded-xl p-4">
+                  <div key={cat.name} className="bg-ocean-900 border border-ocean-800 rounded-xl p-4">
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
                         
@@ -671,29 +672,29 @@ export default function FinancesPage() {
                         </span>
                       </div>
                     </div>
-                    <div className="h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                    <div className="h-1.5 bg-ocean-800 rounded-full overflow-hidden">
                       <div
                         className={`h-full rounded-full ${pctOfIncome >= 40 ? "bg-red-500" : pctOfIncome >= 20 ? "bg-yellow-500" : "bg-green-500"}`}
                         style={{ width: `${Math.min(barW, 100)}%` }}
                       />
                     </div>
-                    <div className="text-xs text-slate-600 mt-1">{pctOfExpense}% del total de egresos</div>
+                    <div className="text-xs text-ocean-600 mt-1">{pctOfExpense}% del total de egresos</div>
                   </div>
                 );
               }).filter(Boolean)}
 
               {/* Resumen final */}
-              <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-3">
+              <div className="bg-ocean-900 border border-ocean-800 rounded-2xl p-5 space-y-3">
                 <div className="text-sm font-semibold text-white">Resumen del mes</div>
                 <div className="grid grid-cols-2 gap-3">
                   {[
                     { label: "Ingresos totales",  value: `$${totalIncome.toLocaleString()}`,  color: "text-green-400" },
                     { label: "Egresos totales",   value: `$${totalExpense.toLocaleString()}`, color: "text-red-400" },
-                    { label: "Balance neto",       value: `${balance >= 0 ? "+" : "-"}$${Math.abs(balance).toLocaleString()}`, color: balance >= 0 ? "text-blue-400" : "text-red-400" },
+                    { label: "Balance neto",       value: `${balance >= 0 ? "+" : "-"}$${Math.abs(balance).toLocaleString()}`, color: balance >= 0 ? "text-brand-300" : "text-red-400" },
                     { label: "Tasa de ahorro",     value: `${savingsRate}%`, color: savingsRate >= 20 ? "text-green-400" : savingsRate >= 10 ? "text-yellow-400" : "text-red-400" },
                   ].map(item => (
-                    <div key={item.label} className="bg-slate-800/50 rounded-xl p-3">
-                      <div className="text-xs text-slate-500 mb-1">{item.label}</div>
+                    <div key={item.label} className="bg-ocean-800/50 rounded-xl p-3">
+                      <div className="text-xs text-ocean-500 mb-1">{item.label}</div>
                       <div className={`text-lg font-black tabular-nums ${item.color}`}>{item.value}</div>
                     </div>
                   ))}
@@ -710,26 +711,26 @@ export default function FinancesPage() {
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-base font-semibold text-white">Historial financiero</h3>
-              <p className="text-xs text-slate-500 mt-0.5">Snapshots guardados mes a mes</p>
+              <p className="text-xs text-ocean-500 mt-0.5">Snapshots guardados mes a mes</p>
             </div>
-            <button onClick={saveMetricSnapshot} className="bg-violet-600 hover:bg-violet-700 text-white text-sm px-4 py-2 rounded-lg">
+            <button onClick={saveMetricSnapshot} className="bg-brand-600 hover:bg-brand-700 text-white text-sm px-4 py-2 rounded-lg">
               Guardar mes actual
             </button>
           </div>
 
           {history.length === 0 ? (
-            <div className="text-center py-14 bg-slate-900 border border-slate-800 rounded-2xl">
-              <div className="text-slate-400 font-medium mb-1">Sin historial</div>
-              <p className="text-slate-600 text-sm max-w-xs mx-auto mb-4">
+            <div className="text-center py-14 bg-ocean-900 border border-ocean-800 rounded-2xl">
+              <div className="text-ocean-400 font-medium mb-1">Sin historial</div>
+              <p className="text-ocean-600 text-sm max-w-xs mx-auto mb-4">
                 Guarda un snapshot al final de cada mes para ver tu evolución aquí.
               </p>
-              <button onClick={saveMetricSnapshot} className="bg-violet-600 hover:bg-violet-700 text-white text-sm px-5 py-2.5 rounded-xl font-medium">
+              <button onClick={saveMetricSnapshot} className="bg-brand-600 hover:bg-brand-700 text-white text-sm px-5 py-2.5 rounded-xl font-medium">
                 Guardar ahora
               </button>
             </div>
           ) : (
             <>
-              <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
+              <div className="bg-ocean-900 border border-ocean-800 rounded-2xl p-5">
                 <div className="text-sm font-medium text-white mb-4">Ingresos vs Egresos</div>
                 <div className="space-y-3">
                   {[...history].reverse().map(snap => {
@@ -737,7 +738,7 @@ export default function FinancesPage() {
                     const maxIncome = Math.max(...history.map(h => h.metrics.total_income), 1);
                     return (
                       <div key={snap.id} className="space-y-1">
-                        <div className="flex justify-between text-xs text-slate-500">
+                        <div className="flex justify-between text-xs text-ocean-500">
                           <span>{snap.week_start}</span>
                           <span className={m.balance >= 0 ? "text-green-400" : "text-red-400"}>
                             {m.balance >= 0 ? "+" : ""}${m.balance.toLocaleString()}
@@ -750,33 +751,33 @@ export default function FinancesPage() {
                       </div>
                     );
                   })}
-                  <div className="flex gap-4 text-xs text-slate-600 mt-2">
+                  <div className="flex gap-4 text-xs text-ocean-600 mt-2">
                     <span className="flex items-center gap-1"><span className="w-3 h-2 bg-green-500/60 rounded-sm inline-block" /> Ingresos</span>
                     <span className="flex items-center gap-1"><span className="w-3 h-2 bg-red-500/60 rounded-sm inline-block" /> Egresos</span>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden">
+              <div className="bg-ocean-900 border border-ocean-800 rounded-2xl overflow-hidden">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-slate-800">
-                      <th className="text-left px-5 py-3 text-slate-400 font-medium text-xs">Período</th>
-                      <th className="text-right px-4 py-3 text-slate-400 font-medium text-xs">Ingresos</th>
-                      <th className="text-right px-4 py-3 text-slate-400 font-medium text-xs">Egresos</th>
-                      <th className="text-right px-4 py-3 text-slate-400 font-medium text-xs">Balance</th>
-                      <th className="text-right px-4 py-3 text-slate-400 font-medium text-xs">Ahorro</th>
+                    <tr className="border-b border-ocean-800">
+                      <th className="text-left px-5 py-3 text-ocean-400 font-medium text-xs">Período</th>
+                      <th className="text-right px-4 py-3 text-ocean-400 font-medium text-xs">Ingresos</th>
+                      <th className="text-right px-4 py-3 text-ocean-400 font-medium text-xs">Egresos</th>
+                      <th className="text-right px-4 py-3 text-ocean-400 font-medium text-xs">Balance</th>
+                      <th className="text-right px-4 py-3 text-ocean-400 font-medium text-xs">Ahorro</th>
                     </tr>
                   </thead>
                   <tbody>
                     {history.map(snap => {
                       const m = snap.metrics;
                       return (
-                        <tr key={snap.id} className="border-b border-slate-800/60 last:border-0 hover:bg-slate-800/30 transition-colors">
-                          <td className="px-5 py-3 text-slate-300">{snap.week_start}</td>
+                        <tr key={snap.id} className="border-b border-ocean-800/60 last:border-0 hover:bg-ocean-800/30 transition-colors">
+                          <td className="px-5 py-3 text-ocean-300">{snap.week_start}</td>
                           <td className="px-4 py-3 text-right text-green-400 font-medium tabular-nums">${m.total_income.toLocaleString()}</td>
                           <td className="px-4 py-3 text-right text-red-400 font-medium tabular-nums">${m.total_expense.toLocaleString()}</td>
-                          <td className={`px-4 py-3 text-right font-bold tabular-nums ${m.balance >= 0 ? "text-blue-400" : "text-red-400"}`}>
+                          <td className={`px-4 py-3 text-right font-bold tabular-nums ${m.balance >= 0 ? "text-brand-300" : "text-red-400"}`}>
                             {m.balance >= 0 ? "+" : ""}${m.balance.toLocaleString()}
                           </td>
                           <td className={`px-4 py-3 text-right font-medium tabular-nums ${(m.savings_rate ?? 0) >= 20 ? "text-green-400" : (m.savings_rate ?? 0) >= 10 ? "text-yellow-400" : "text-red-400"}`}>

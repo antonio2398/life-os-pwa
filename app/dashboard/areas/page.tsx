@@ -192,7 +192,7 @@ export default function AreasPage() {
 
   if (loading) return (
     <div className="flex items-center justify-center h-64">
-      <div className="text-slate-400 animate-pulse">Cargando diagnóstico...</div>
+      <div className="text-ocean-400 animate-pulse">Cargando diagnóstico...</div>
     </div>
   );
 
@@ -203,21 +203,21 @@ export default function AreasPage() {
       <div className="flex items-start justify-between">
         <div>
           <h2 className="text-2xl font-bold text-white">Diagnóstico de Vida</h2>
-          <p className="text-slate-400 text-sm mt-1">
+          <p className="text-ocean-400 text-sm mt-1">
             Evaluaciones periódicas con historial completo de evolución.
           </p>
         </div>
         <div className="text-right">
-          <div className="text-xs text-slate-500 uppercase tracking-widest mb-1">Life Score</div>
+          <div className="text-xs text-ocean-500 uppercase tracking-widest mb-1">Life Score</div>
           <div className={`text-5xl font-black tabular-nums ${
             lifeScore >= 70 ? "text-green-400" : lifeScore >= 40 ? "text-yellow-400" : "text-red-400"
           }`}>{Math.round(lifeScore)}</div>
-          <div className="text-xs text-slate-600 mt-0.5">sobre 100</div>
+          <div className="text-xs text-ocean-600 mt-0.5">sobre 100</div>
         </div>
       </div>
 
       {/* ── PORTFOLIO BAR ───────────────────────────────────────────────── */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
+      <div className="bg-ocean-900 border border-ocean-800 rounded-2xl p-5">
         <div className="grid grid-cols-7 gap-2">
           {LIFE_AREAS.map(area => {
             const score = latest[area.id]?.score ?? 0;
@@ -230,27 +230,27 @@ export default function AreasPage() {
                 title={`Ver historial de ${area.name}`}
               >
                 <span className="block w-3 h-3 rounded-full mx-auto" style={{ backgroundColor: area.color }} />
-                <div className="h-20 bg-slate-800 rounded-lg overflow-hidden flex flex-col justify-end relative">
-                  <div className="absolute inset-0 bg-slate-700/0 group-hover:bg-slate-700/30 transition-colors rounded-lg z-10" />
+                <div className="h-20 bg-ocean-800 rounded-lg overflow-hidden flex flex-col justify-end relative">
+                  <div className="absolute inset-0 bg-ocean-700/0 group-hover:bg-ocean-700/30 transition-colors rounded-lg z-10" />
                   <div className="rounded-lg transition-all duration-700" style={{ height: `${score}%`, backgroundColor: area.color }} />
                 </div>
                 <div className="text-xs font-bold text-white tabular-nums">{score}</div>
-                <div className="text-xs text-slate-600">{recs} eval{recs !== 1 ? "s" : ""}</div>
+                <div className="text-xs text-ocean-600">{recs} eval{recs !== 1 ? "s" : ""}</div>
               </button>
             );
           })}
         </div>
-        <p className="text-xs text-slate-600 text-center mt-3">Clic en cualquier área para ver su historial</p>
+        <p className="text-xs text-ocean-600 text-center mt-3">Clic en cualquier área para ver su historial</p>
       </div>
 
       {/* ── TABS ────────────────────────────────────────────────────────── */}
-      <div className="flex gap-1 bg-slate-900 border border-slate-800 rounded-xl p-1">
+      <div className="flex gap-1 bg-ocean-900 border border-ocean-800 rounded-xl p-1">
         <button onClick={() => setActiveTab("current")}
-          className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${activeTab === "current" ? "bg-violet-600 text-white" : "text-slate-400 hover:text-white"}`}>
+          className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${activeTab === "current" ? "bg-brand-600 text-white" : "text-ocean-400 hover:text-white"}`}>
           Evaluación actual
         </button>
         <button onClick={() => setActiveTab("history")}
-          className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${activeTab === "history" ? "bg-violet-600 text-white" : "text-slate-400 hover:text-white"}`}>
+          className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${activeTab === "history" ? "bg-brand-600 text-white" : "text-ocean-400 hover:text-white"}`}>
           Historial completo
         </button>
       </div>
@@ -279,10 +279,10 @@ export default function AreasPage() {
                       <span className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: area.color }} />
                       <div>
                         <div className="font-semibold text-white text-lg">{area.name}</div>
-                        <div className="text-xs text-slate-500">
-                          Peso: <span className="text-slate-300">{area.weight}%</span>
+                        <div className="text-xs text-ocean-500">
+                          Peso: <span className="text-ocean-300">{area.weight}%</span>
                           {" · "}{QUESTIONS[area.id]?.length ?? 0} preguntas
-                          {recs > 0 && <span className="ml-2 text-slate-600">· {recs} evaluación{recs !== 1 ? "es" : ""} guardada{recs !== 1 ? "s" : ""}</span>}
+                          {recs > 0 && <span className="ml-2 text-ocean-600">· {recs} evaluación{recs !== 1 ? "es" : ""} guardada{recs !== 1 ? "s" : ""}</span>}
                         </div>
                       </div>
                     </div>
@@ -290,13 +290,13 @@ export default function AreasPage() {
                       <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${status.cls}`}>{status.label}</span>
                       <button
                         onClick={() => { setHistArea(area.id); setActiveTab("history"); }}
-                        className="text-slate-500 hover:text-slate-300 text-xs px-2 py-1 rounded border border-slate-700 hover:border-slate-500 transition-colors"
+                        className="text-ocean-500 hover:text-ocean-300 text-xs px-2 py-1 rounded border border-ocean-700 hover:border-ocean-500 transition-colors"
                       >
                         Historial ({recs})
                       </button>
                       <button
                         onClick={() => isEditing ? setEditing(null) : openEdit(area.id)}
-                        className="text-violet-400 hover:text-violet-300 text-sm px-3 py-1 rounded border border-violet-700 hover:border-violet-500 transition-colors"
+                        className="text-brand-400 hover:text-brand-300 text-sm px-3 py-1 rounded border border-brand-700 hover:border-brand-500 transition-colors"
                       >
                         {isEditing ? "Cancelar" : current ? "Re-evaluar" : "Evaluar"}
                       </button>
@@ -306,26 +306,26 @@ export default function AreasPage() {
                   {/* Score bar */}
                   <div className="space-y-2">
                     <div className="flex items-center gap-3">
-                      <div className="flex-1 h-3 bg-slate-800 rounded-full overflow-hidden">
+                      <div className="flex-1 h-3 bg-ocean-800 rounded-full overflow-hidden">
                         <div className="h-full rounded-full transition-all duration-700"
                           style={{ width: `${score}%`, backgroundColor: area.color }} />
                       </div>
                       <div className="text-2xl font-black text-white tabular-nums w-20 text-right">
-                        {score}<span className="text-sm text-slate-500">/100</span>
+                        {score}<span className="text-sm text-ocean-500">/100</span>
                       </div>
                     </div>
                     {target > 0 && (
-                      <div className="flex items-center gap-2 text-xs text-slate-500">
+                      <div className="flex items-center gap-2 text-xs text-ocean-500">
                         <span>Objetivo 90d:</span>
-                        <span className="text-slate-300 font-medium">{target}/100</span>
+                        <span className="text-ocean-300 font-medium">{target}/100</span>
                         <span className={score >= target ? "text-green-400" : "text-yellow-400"}>
                           {score >= target ? "Alcanzado" : `+${target - score} por lograr`}
                         </span>
                       </div>
                     )}
-                    {current?.notes && <div className="text-xs text-slate-400 italic">{current.notes}</div>}
+                    {current?.notes && <div className="text-xs text-ocean-400 italic">{current.notes}</div>}
                     {current?.evaluated_at && (
-                      <div className="text-xs text-slate-600">Última evaluación: {fmtDate(current.evaluated_at)}</div>
+                      <div className="text-xs text-ocean-600">Última evaluación: {fmtDate(current.evaluated_at)}</div>
                     )}
 
                     {/* Question pills */}
@@ -350,15 +350,15 @@ export default function AreasPage() {
 
                 {/* Eval form */}
                 {isEditing && (
-                  <div className="border-t border-slate-700/50 bg-slate-900/60 p-5 space-y-5">
+                  <div className="border-t border-ocean-700/50 bg-ocean-900/60 p-5 space-y-5">
                     <div className="flex items-center justify-between">
                       <div className="text-sm font-semibold text-white">Nueva evaluación — {area.name}</div>
                       {liveScore !== null && (
                         <div className="flex items-center gap-2">
-                          <span className="text-xs text-slate-500">Puntaje calculado:</span>
+                          <span className="text-xs text-ocean-500">Puntaje calculado:</span>
                           <span className={`text-2xl font-black tabular-nums ${
                             liveScore >= 70 ? "text-green-400" : liveScore >= 40 ? "text-yellow-400" : "text-red-400"
-                          }`}>{liveScore}<span className="text-xs text-slate-500">/100</span></span>
+                          }`}>{liveScore}<span className="text-xs text-ocean-500">/100</span></span>
                         </div>
                       )}
                     </div>
@@ -369,13 +369,13 @@ export default function AreasPage() {
                         const val = liveQs?.[q.id] ?? 5;
                         const qColor = val >= 8 ? "#22c55e" : val >= 5 ? "#eab308" : "#ef4444";
                         return (
-                          <div key={q.id} className="bg-slate-800/50 rounded-xl p-4 space-y-3">
+                          <div key={q.id} className="bg-ocean-800/50 rounded-xl p-4 space-y-3">
                             <div className="flex items-start justify-between gap-3">
                               <div className="flex items-start gap-2">
-                                <span className="text-slate-500 text-sm font-mono mt-0.5 shrink-0">{qi + 1}.</span>
+                                <span className="text-ocean-500 text-sm font-mono mt-0.5 shrink-0">{qi + 1}.</span>
                                 <div>
                                   <div className="text-sm text-white font-medium">{q.label}</div>
-                                  <div className="text-xs text-slate-500 mt-0.5">{q.tip}</div>
+                                  <div className="text-xs text-ocean-500 mt-0.5">{q.tip}</div>
                                 </div>
                               </div>
                               <div className="text-2xl font-black tabular-nums shrink-0 w-10 text-right" style={{ color: qColor }}>{val}</div>
@@ -384,7 +384,7 @@ export default function AreasPage() {
                             <input type="range" min={0} max={10} step={1} value={val}
                               onChange={e => setQ(area.id, q.id, Number(e.target.value))}
                               className={`w-full h-2 ${area.accent}`} />
-                            <div className="flex justify-between text-xs text-slate-600">
+                            <div className="flex justify-between text-xs text-ocean-600">
                               {[0,1,2,3,4,5,6,7,8,9,10].map(n => (
                                 <span key={n} className={val === n ? "text-white font-bold" : ""}>{n}</span>
                               ))}
@@ -402,8 +402,8 @@ export default function AreasPage() {
                                 <button key={btn.val} onClick={() => setQ(area.id, q.id, btn.val)}
                                   className={`text-xs px-2.5 py-1 rounded-full border transition-colors ${
                                     val === btn.val
-                                      ? "border-violet-500 bg-violet-500/20 text-violet-300"
-                                      : "border-slate-700 text-slate-500 hover:border-slate-500 hover:text-slate-300"
+                                      ? "border-brand-500 bg-brand-500/20 text-brand-300"
+                                      : "border-ocean-700 text-ocean-500 hover:border-ocean-500 hover:text-ocean-300"
                                   }`}>{btn.label}</button>
                               ))}
                             </div>
@@ -421,17 +421,17 @@ export default function AreasPage() {
                       }`}>
                         <div className="flex items-center justify-between">
                           <div>
-                            <div className="text-xs text-slate-400 mb-1">Promedio de {QUESTIONS[area.id]?.length} preguntas × 10</div>
+                            <div className="text-xs text-ocean-400 mb-1">Promedio de {QUESTIONS[area.id]?.length} preguntas × 10</div>
                             <div className="flex gap-2 flex-wrap">
                               {(QUESTIONS[area.id] ?? []).map(q => (
-                                <span key={q.id} className="text-xs text-slate-500">{liveQs?.[q.id] ?? 5}</span>
+                                <span key={q.id} className="text-xs text-ocean-500">{liveQs?.[q.id] ?? 5}</span>
                               ))}
-                              <span className="text-xs text-slate-600">→ promedio ×10</span>
+                              <span className="text-xs text-ocean-600">→ promedio ×10</span>
                             </div>
                           </div>
                           <div className={`text-4xl font-black tabular-nums ${
                             liveScore >= 70 ? "text-green-400" : liveScore >= 40 ? "text-yellow-400" : "text-red-400"
-                          }`}>{liveScore}<span className="text-lg text-slate-500">/100</span></div>
+                          }`}>{liveScore}<span className="text-lg text-ocean-500">/100</span></div>
                         </div>
                       </div>
                     )}
@@ -440,30 +440,30 @@ export default function AreasPage() {
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <div className="flex justify-between text-sm mb-2">
-                          <label className="text-slate-400">Objetivo a 90 días</label>
-                          <span className="font-bold text-violet-400">{target90[area.id] ?? 70}/100</span>
+                          <label className="text-ocean-400">Objetivo a 90 días</label>
+                          <span className="font-bold text-brand-400">{target90[area.id] ?? 70}/100</span>
                         </div>
                         <input type="range" min={0} max={100} step={5}
                           value={target90[area.id] ?? 70}
                           onChange={e => setTarget90(prev => ({ ...prev, [area.id]: Number(e.target.value) }))}
-                          className="w-full accent-violet-500 h-2" />
+                          className="w-full accent-brand-500 h-2" />
                       </div>
                       <div>
-                        <label className="text-sm text-slate-400 block mb-2">Notas</label>
+                        <label className="text-sm text-ocean-400 block mb-2">Notas</label>
                         <textarea value={notesMap[area.id] ?? ""}
                           onChange={e => setNotesMap(prev => ({ ...prev, [area.id]: e.target.value }))}
                           rows={2} placeholder="¿Qué está funcionando? ¿Qué mejorar?"
-                          className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-violet-500 resize-none text-sm" />
+                          className="w-full bg-ocean-800 border border-ocean-700 rounded-lg px-3 py-2 text-white placeholder-ocean-500 focus:outline-none focus:border-brand-500 resize-none text-sm" />
                       </div>
                     </div>
 
                     <div className="flex gap-2">
                       <button onClick={() => saveEval(area.id)} disabled={saving}
-                        className="bg-violet-600 hover:bg-violet-700 disabled:opacity-50 text-white text-sm px-6 py-2.5 rounded-lg font-medium transition-colors">
+                        className="bg-brand-600 hover:bg-brand-700 disabled:opacity-50 text-white text-sm px-6 py-2.5 rounded-lg font-medium transition-colors">
                         {saving ? "Guardando..." : `Guardar evaluación (${liveScore ?? 0}/100)`}
                       </button>
                       <button onClick={() => setEditing(null)}
-                        className="text-slate-400 hover:text-white text-sm px-4 py-2 rounded-lg border border-slate-700 transition-colors">
+                        className="text-ocean-400 hover:text-white text-sm px-4 py-2 rounded-lg border border-ocean-700 transition-colors">
                         Cancelar
                       </button>
                     </div>
@@ -485,25 +485,25 @@ export default function AreasPage() {
           <div className="flex gap-2 flex-wrap">
             <button onClick={() => setHistArea(null)}
               className={`px-3 py-1.5 text-xs rounded-lg border transition-colors ${
-                histArea === null ? "bg-violet-600 border-violet-600 text-white" : "border-slate-700 text-slate-400 hover:text-white"
+                histArea === null ? "bg-brand-600 border-brand-600 text-white" : "border-ocean-700 text-ocean-400 hover:text-white"
               }`}>
               Todas las áreas
             </button>
             {LIFE_AREAS.map(area => (
               <button key={area.id} onClick={() => setHistArea(area.id)}
                 className={`px-3 py-1.5 text-xs rounded-lg border transition-colors flex items-center gap-1 ${
-                  histArea === area.id ? "text-white" : "border-slate-700 text-slate-400 hover:text-white hover:border-slate-500"
+                  histArea === area.id ? "text-white" : "border-ocean-700 text-ocean-400 hover:text-white hover:border-ocean-500"
                 }`}
                 style={histArea === area.id ? { backgroundColor: area.color + "30", borderColor: area.color + "60", color: area.color } : {}}>
                 {area.name.split(" / ")[0]}
-                <span className="text-slate-500 font-mono ml-1">({allRecords[area.id]?.length ?? 0})</span>
+                <span className="text-ocean-500 font-mono ml-1">({allRecords[area.id]?.length ?? 0})</span>
               </button>
             ))}
           </div>
 
           {/* ── Life Score trend (all areas) ── */}
           {histArea === null && (
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
+            <div className="bg-ocean-900 border border-ocean-800 rounded-2xl p-5">
               <h3 className="text-sm font-semibold text-white mb-4">Evolución del Life Score global</h3>
 
               {/* Build timeline: get all unique dates, compute life score for each */}
@@ -514,7 +514,7 @@ export default function AreasPage() {
                 )).sort();
 
                 if (allDates.length < 2) return (
-                  <div className="text-slate-600 text-sm text-center py-8">
+                  <div className="text-ocean-600 text-sm text-center py-8">
                     Necesitas al menos 2 evaluaciones para ver la evolución. Evalúa las áreas periódicamente.
                   </div>
                 );
@@ -542,7 +542,7 @@ export default function AreasPage() {
                         {[25, 50, 75, 100].map(y => (
                           <g key={y}>
                             <line x1={0} y1={chartH - (y / maxScore) * chartH} x2="100%" y2={chartH - (y / maxScore) * chartH}
-                              stroke="#1e293b" strokeWidth={1} />
+                              stroke="#1A3045" strokeWidth={1} />
                             <text x={4} y={chartH - (y / maxScore) * chartH - 3} fill="#475569" fontSize={9}>{y}</text>
                           </g>
                         ))}
@@ -550,7 +550,7 @@ export default function AreasPage() {
                         {/* Area fill */}
                         {timeline.length > 1 && (
                           <polyline
-                            fill="none" stroke="#7c3aed" strokeWidth={2.5} strokeLinejoin="round"
+                            fill="none" stroke="#2CC7D5" strokeWidth={2.5} strokeLinejoin="round"
                             points={timeline.map((p, i) => `${40 + i * 80},${chartH - (p.score / maxScore) * chartH}`).join(" ")}
                           />
                         )}
@@ -562,7 +562,7 @@ export default function AreasPage() {
                           const color = p.score >= 70 ? "#22c55e" : p.score >= 40 ? "#eab308" : "#ef4444";
                           return (
                             <g key={i}>
-                              <circle cx={x} cy={y} r={5} fill={color} stroke="#0f172a" strokeWidth={2} />
+                              <circle cx={x} cy={y} r={5} fill={color} stroke="#0F2133" strokeWidth={2} />
                               <text x={x} y={y - 10} textAnchor="middle" fill={color} fontSize={10} fontWeight="bold">{p.score}</text>
                               <text x={x} y={chartH + 16} textAnchor="middle" fill="#475569" fontSize={8}>{p.date.slice(5)}</text>
                             </g>
@@ -577,10 +577,10 @@ export default function AreasPage() {
                       const last  = timeline[timeline.length - 1].score;
                       const delta = last - first;
                       return (
-                        <div className="flex items-center gap-3 mt-3 pt-3 border-t border-slate-800">
-                          <div className="text-xs text-slate-500">Inicio: <span className="text-white">{first}/100</span></div>
-                          <div className="text-xs text-slate-500">→</div>
-                          <div className="text-xs text-slate-500">Actual: <span className="text-white">{last}/100</span></div>
+                        <div className="flex items-center gap-3 mt-3 pt-3 border-t border-ocean-800">
+                          <div className="text-xs text-ocean-500">Inicio: <span className="text-white">{first}/100</span></div>
+                          <div className="text-xs text-ocean-500">→</div>
+                          <div className="text-xs text-ocean-500">Actual: <span className="text-white">{last}/100</span></div>
                           <div className={`text-xs font-bold ml-auto ${delta >= 0 ? "text-green-400" : "text-red-400"}`}>
                             {delta >= 0 ? "+" : ""}{delta} puntos en {timeline.length} evaluaciones
                           </div>
@@ -602,7 +602,7 @@ export default function AreasPage() {
                   <span className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: area.color }} />
                   <span className="font-semibold text-white">{area.name}</span>
                 </div>
-                <div className="text-slate-600 text-sm">Sin evaluaciones. Usa la pestaña "Evaluación actual" para empezar.</div>
+                <div className="text-ocean-600 text-sm">Sin evaluaciones. Usa la pestaña "Evaluación actual" para empezar.</div>
               </div>
             );
 
@@ -620,7 +620,7 @@ export default function AreasPage() {
                       <span className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: area.color }} />
                       <div>
                         <div className="font-semibold text-white">{area.name}</div>
-                        <div className="text-xs text-slate-500">{recs.length} evaluación{recs.length !== 1 ? "es" : ""} · Peso: {area.weight}%</div>
+                        <div className="text-xs text-ocean-500">{recs.length} evaluación{recs.length !== 1 ? "es" : ""} · Peso: {area.weight}%</div>
                       </div>
                     </div>
                     <div className="text-right">
@@ -643,7 +643,7 @@ export default function AreasPage() {
                         {/* Grid */}
                         {[25, 50, 75].map(y => (
                           <line key={y} x1={0} y1={chartH - (y / 100) * chartH} x2={chartW} y2={chartH - (y / 100) * chartH}
-                            stroke="#1e293b" strokeWidth={1} />
+                            stroke="#1A3045" strokeWidth={1} />
                         ))}
 
                         {/* Line */}
@@ -656,7 +656,7 @@ export default function AreasPage() {
                           const y = chartH - (r.score / 100) * chartH;
                           return (
                             <g key={r.id}>
-                              <circle cx={x} cy={y} r={4} fill={area.color} stroke="#0f172a" strokeWidth={2} />
+                              <circle cx={x} cy={y} r={4} fill={area.color} stroke="#0F2133" strokeWidth={2} />
                               <text x={x} y={y - 8} textAnchor="middle" fill={area.color} fontSize={9} fontWeight="bold">{r.score}</text>
                               <text x={x} y={chartH + 16} textAnchor="middle" fill="#475569" fontSize={7}>{r.evaluated_at.slice(5, 10)}</text>
                             </g>
@@ -668,34 +668,34 @@ export default function AreasPage() {
                 </div>
 
                 {/* Record list */}
-                <div className="border-t border-slate-700/40">
+                <div className="border-t border-ocean-700/40">
                   {recs.map((rec, idx) => {
                     const prev     = recs[idx + 1];
                     const delta    = prev ? rec.score - prev.score : null;
                     const isFirst  = idx === 0;
 
                     return (
-                      <div key={rec.id} className={`px-5 py-4 flex items-start gap-4 ${idx > 0 ? "border-t border-slate-800/60" : ""} ${isFirst ? "bg-slate-800/20" : ""}`}>
+                      <div key={rec.id} className={`px-5 py-4 flex items-start gap-4 ${idx > 0 ? "border-t border-ocean-800/60" : ""} ${isFirst ? "bg-ocean-800/20" : ""}`}>
                         {/* Score badge */}
                         <div className="text-center shrink-0 w-16">
                           <div className={`text-xl font-black tabular-nums ${
                             rec.score >= 70 ? "text-green-400" : rec.score >= 40 ? "text-yellow-400" : "text-red-400"
                           }`}>{rec.score}</div>
-                          <div className="text-xs text-slate-600">/100</div>
+                          <div className="text-xs text-ocean-600">/100</div>
                           {delta !== null && (
-                            <div className={`text-xs font-medium mt-0.5 ${delta > 0 ? "text-green-400" : delta < 0 ? "text-red-400" : "text-slate-500"}`}>
+                            <div className={`text-xs font-medium mt-0.5 ${delta > 0 ? "text-green-400" : delta < 0 ? "text-red-400" : "text-ocean-500"}`}>
                               {delta > 0 ? "▲" : delta < 0 ? "▼" : "="}{Math.abs(delta)}
                             </div>
                           )}
-                          {isFirst && <div className="text-xs text-violet-400 mt-0.5">Actual</div>}
+                          {isFirst && <div className="text-xs text-brand-400 mt-0.5">Actual</div>}
                         </div>
 
                         {/* Detail */}
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between mb-2">
-                            <div className="text-xs text-slate-400">{fmtDate(rec.evaluated_at)}</div>
+                            <div className="text-xs text-ocean-400">{fmtDate(rec.evaluated_at)}</div>
                             {rec.target_90d > 0 && (
-                              <div className="text-xs text-slate-500">
+                              <div className="text-xs text-ocean-500">
                                 Meta 90d: <span className={rec.score >= rec.target_90d ? "text-green-400" : "text-yellow-400"}>{rec.target_90d}/100</span>
                               </div>
                             )}
@@ -727,12 +727,12 @@ export default function AreasPage() {
                             </div>
                           )}
 
-                          {rec.notes && <div className="text-xs text-slate-400 italic">{rec.notes}</div>}
+                          {rec.notes && <div className="text-xs text-ocean-400 italic">{rec.notes}</div>}
                         </div>
 
                         {/* Delete */}
                         <button onClick={() => deleteRecord(rec.id)}
-                          className="text-slate-700 hover:text-red-400 text-xs transition-colors shrink-0 mt-0.5"><X size={14} /></button>
+                          className="text-ocean-700 hover:text-red-400 text-xs transition-colors shrink-0 mt-0.5"><X size={14} /></button>
                       </div>
                     );
                   })}

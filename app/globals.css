@@ -2,26 +2,55 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Shark Life — tema oscuro "océano profundo" */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --background: #081523;
+  --foreground: #e3edf3;
+  color-scheme: dark;
 }
 
 body {
   color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  background:
+    radial-gradient(1200px 600px at 100% -10%, rgba(44, 199, 213, 0.07), transparent 60%),
+    radial-gradient(900px 500px at -10% 110%, rgba(11, 127, 143, 0.08), transparent 60%),
+    var(--background);
+  background-attachment: fixed;
+}
+
+::selection {
+  background: rgba(44, 199, 213, 0.35);
+  color: #ffffff;
+}
+
+/* Barras de desplazamiento discretas */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #1a3045 transparent;
+}
+*::-webkit-scrollbar { width: 8px; height: 8px; }
+*::-webkit-scrollbar-thumb { background: #1a3045; border-radius: 8px; }
+*::-webkit-scrollbar-thumb:hover { background: #2c465c; }
+*::-webkit-scrollbar-track { background: transparent; }
+
+/* Foco visible y consistente para teclado */
+:focus-visible {
+  outline: 2px solid #2cc7d5;
+  outline-offset: 2px;
+}
+
+/* Inputs de fecha/mes legibles en tema oscuro */
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="month"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.75) sepia(1) hue-rotate(140deg) saturate(3);
+  cursor: pointer;
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
   }
 }

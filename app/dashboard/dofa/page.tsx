@@ -295,11 +295,11 @@ export default function DofaPage() {
       <div className="flex items-start justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold text-white">DOFA Estratégico</h2>
-          <p className="text-slate-400 text-sm mt-1">
+          <p className="text-ocean-400 text-sm mt-1">
             Análisis dinámico generado desde tu diagnóstico. Actualizar cada domingo.
           </p>
           {lastGen && !preview && (
-            <p className="text-xs text-slate-600 mt-0.5">
+            <p className="text-xs text-ocean-600 mt-0.5">
               Última generación IA: {new Date(lastGen).toLocaleDateString("es-MX", { day: "numeric", month: "long", year: "numeric" })}
             </p>
           )}
@@ -308,7 +308,7 @@ export default function DofaPage() {
           onClick={generateWithAI}
           disabled={aiLoading || diagScores.length === 0}
           title={diagScores.length === 0 ? "Completa el diagnóstico primero" : "Generar DOFA con IA"}
-          className="bg-violet-600 hover:bg-violet-700 disabled:opacity-40 disabled:cursor-not-allowed text-white px-5 py-2.5 rounded-xl font-medium transition-colors flex items-center gap-2 text-sm shrink-0"
+          className="bg-brand-600 hover:bg-brand-700 disabled:opacity-40 disabled:cursor-not-allowed text-white px-5 py-2.5 rounded-xl font-medium transition-colors flex items-center gap-2 text-sm shrink-0"
         >
           {aiLoading
             ? <><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin inline-block" /> Analizando...</>
@@ -323,7 +323,7 @@ export default function DofaPage() {
           <div>
             <strong className="text-red-200">Error:</strong> {aiError}
             {aiError.includes("diagnóstico") && (
-              <button onClick={() => setActiveTab("diagnostic")} className="block mt-1.5 text-xs text-violet-400 underline">
+              <button onClick={() => setActiveTab("diagnostic")} className="block mt-1.5 text-xs text-brand-400 underline">
                 → Ver estado del diagnóstico
               </button>
             )}
@@ -333,29 +333,29 @@ export default function DofaPage() {
 
       {/* ── AI PREVIEW BANNER ─────────────────────────────────────────────────*/}
       {preview && (
-        <div className="bg-violet-900/30 border border-violet-500/50 rounded-xl px-5 py-4 flex items-start justify-between gap-4">
+        <div className="bg-brand-900/30 border border-brand-500/50 rounded-xl px-5 py-4 flex items-start justify-between gap-4">
           <div>
             <div className="text-white font-semibold text-sm">DOFA generado con IA desde tu diagnóstico</div>
-            <div className="text-violet-300 text-xs mt-1">
+            <div className="text-brand-300 text-xs mt-1">
               Edita los ítems antes de guardar. Los ítems manuales no se modifican.
             </div>
           </div>
           <div className="flex gap-2 shrink-0">
             <button
               onClick={() => { setPreview(null); setPendingItems({}); setPendingStrats({}); }}
-              className="text-slate-400 hover:text-white text-sm px-4 py-2 rounded-lg border border-slate-700 transition-colors"
+              className="text-ocean-400 hover:text-white text-sm px-4 py-2 rounded-lg border border-ocean-700 transition-colors"
             >Descartar</button>
             <button
               onClick={saveAiPreview}
               disabled={saving}
-              className="bg-violet-600 hover:bg-violet-700 disabled:opacity-50 text-white text-sm px-5 py-2 rounded-lg font-medium transition-colors"
+              className="bg-brand-600 hover:bg-brand-700 disabled:opacity-50 text-white text-sm px-5 py-2 rounded-lg font-medium transition-colors"
             >{saving ? "Guardando..." : "Guardar DOFA"}</button>
           </div>
         </div>
       )}
 
       {/* ── TABS ──────────────────────────────────────────────────────────────*/}
-      <div className="flex gap-1 bg-slate-900 border border-slate-800 rounded-xl p-1">
+      <div className="flex gap-1 bg-ocean-900 border border-ocean-800 rounded-xl p-1">
         {([
           ["diagnostic", `Diagnóstico (${diagScores.length}/7)`],
           ["dofa",       `Análisis${preview ? " (preview)" : ` (${totalSwot})`}`],
@@ -364,7 +364,7 @@ export default function DofaPage() {
         ] as [typeof activeTab, string][]).map(([tab, label]) => (
           <button key={tab} onClick={() => setActiveTab(tab)}
             className={`flex-1 py-2 text-xs font-medium rounded-lg transition-colors ${
-              activeTab === tab ? "bg-violet-600 text-white" : "text-slate-400 hover:text-white"
+              activeTab === tab ? "bg-brand-600 text-white" : "text-ocean-400 hover:text-white"
             }`}
           >{label}</button>
         ))}
@@ -377,11 +377,11 @@ export default function DofaPage() {
         <div className="space-y-4">
           {/* Summary card */}
           {diagSummary ? (
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
+            <div className="bg-ocean-900 border border-ocean-800 rounded-2xl p-5">
               <div className="flex items-center justify-between mb-4">
                 <div>
                   <div className="text-sm font-semibold text-white">Estado del diagnóstico</div>
-                  <div className="text-xs text-slate-500 mt-0.5">
+                  <div className="text-xs text-ocean-500 mt-0.5">
                     La IA analiza estos datos para generar un DOFA personalizado
                   </div>
                 </div>
@@ -391,17 +391,17 @@ export default function DofaPage() {
                     : diagSummary.lifeScore >= 40 ? "text-yellow-400"
                     : "text-red-400"
                   }`}>{diagSummary.lifeScore}</div>
-                  <div className="text-xs text-slate-500">Life Score</div>
+                  <div className="text-xs text-ocean-500">Life Score</div>
                 </div>
               </div>
               <div className="space-y-1.5">
-                <div className="flex justify-between text-xs text-slate-500">
+                <div className="flex justify-between text-xs text-ocean-500">
                   <span>Áreas evaluadas</span>
                   <span>{diagSummary.areasEvaluated} / 7</span>
                 </div>
-                <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
+                <div className="h-2 bg-ocean-800 rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-violet-500 rounded-full transition-all"
+                    className="h-full bg-brand-500 rounded-full transition-all"
                     style={{ width: `${(diagSummary.areasEvaluated / 7) * 100}%` }}
                   />
                 </div>
@@ -418,12 +418,12 @@ export default function DofaPage() {
               </div>
             </div>
           ) : (
-            <div className="text-center py-16 bg-slate-900 border border-slate-800 rounded-2xl">
-              <div className="text-lg font-medium text-slate-400 mb-2">Sin diagnóstico todavía</div>
-              <p className="text-slate-500 text-sm max-w-xs mx-auto mb-5">
+            <div className="text-center py-16 bg-ocean-900 border border-ocean-800 rounded-2xl">
+              <div className="text-lg font-medium text-ocean-400 mb-2">Sin diagnóstico todavía</div>
+              <p className="text-ocean-500 text-sm max-w-xs mx-auto mb-5">
                 Evalúa tus áreas de vida para que la IA pueda analizar tu situación y generar un DOFA personalizado.
               </p>
-              <a href="/areas" className="inline-block bg-violet-600 hover:bg-violet-700 text-white px-6 py-2.5 rounded-xl text-sm font-medium transition-colors">
+              <a href="/areas" className="inline-block bg-brand-600 hover:bg-brand-700 text-white px-6 py-2.5 rounded-xl text-sm font-medium transition-colors">
                 Ir al Diagnóstico →
               </a>
             </div>
@@ -437,23 +437,23 @@ export default function DofaPage() {
                 const found  = diagScores.find(s => s.area_id === areaId);
                 const score  = found?.score ?? null;
                 return (
-                  <div key={areaId} className={`flex items-center gap-4 bg-slate-900 border rounded-xl px-5 py-3.5 transition-opacity ${!found ? "border-slate-800 opacity-50" : "border-slate-700"}`}>
+                  <div key={areaId} className={`flex items-center gap-4 bg-ocean-900 border rounded-xl px-5 py-3.5 transition-opacity ${!found ? "border-ocean-800 opacity-50" : "border-ocean-700"}`}>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between mb-1">
                         <span className="text-sm font-medium text-white">{area.name}</span>
                         <div className="flex items-center gap-3">
-                          <span className="text-xs text-slate-500">Peso: {AREA_WEIGHTS[areaId]}%</span>
+                          <span className="text-xs text-ocean-500">Peso: {AREA_WEIGHTS[areaId]}%</span>
                           {score !== null ? (
                             <span className={`text-base font-black tabular-nums ${
                               score >= 70 ? "text-green-400" : score >= 40 ? "text-yellow-400" : "text-red-400"
-                            }`}>{score}<span className="text-xs text-slate-500 font-normal">/100</span></span>
+                            }`}>{score}<span className="text-xs text-ocean-500 font-normal">/100</span></span>
                           ) : (
-                            <span className="text-xs text-slate-600 italic">Sin evaluar</span>
+                            <span className="text-xs text-ocean-600 italic">Sin evaluar</span>
                           )}
                         </div>
                       </div>
                       {score !== null && (
-                        <div className="h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                        <div className="h-1.5 bg-ocean-800 rounded-full overflow-hidden">
                           <div className="h-full rounded-full transition-all" style={{
                             width: `${score}%`,
                             backgroundColor: score >= 70 ? "#22c55e" : score >= 40 ? "#eab308" : "#ef4444"
@@ -469,7 +469,7 @@ export default function DofaPage() {
                       }`}>{score >= 70 ? "Fuerte" : score >= 40 ? "Medio" : "Débil"}</span>
                     )}
                     {!found && (
-                      <a href="/areas" className="text-xs text-violet-400 hover:text-violet-300 underline shrink-0">Evaluar →</a>
+                      <a href="/areas" className="text-xs text-brand-400 hover:text-brand-300 underline shrink-0">Evaluar →</a>
                     )}
                   </div>
                 );
@@ -482,7 +482,7 @@ export default function DofaPage() {
             <button
               onClick={generateWithAI}
               disabled={aiLoading}
-              className="w-full bg-violet-600 hover:bg-violet-700 disabled:opacity-50 text-white py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2"
+              className="w-full bg-brand-600 hover:bg-brand-700 disabled:opacity-50 text-white py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2"
             >
               {aiLoading
                 ? <><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Generando DOFA...</>
@@ -514,7 +514,7 @@ export default function DofaPage() {
                     </div>
                     <span className={`text-xs font-medium ${color}`}>{dispItems.length}</span>
                   </div>
-                  <p className="text-xs text-slate-500 mb-4">{desc}</p>
+                  <p className="text-xs text-ocean-500 mb-4">{desc}</p>
 
                   {/* Items */}
                   <ul className="space-y-1.5 mb-3 min-h-[80px]">
@@ -524,16 +524,16 @@ export default function DofaPage() {
                       const isAI   = dbItem?.source === "ai";
 
                       return (
-                        <li key={iid} className="group flex items-start gap-2 bg-slate-800/50 hover:bg-slate-800/80 rounded-lg px-3 py-2 transition-colors">
+                        <li key={iid} className="group flex items-start gap-2 bg-ocean-800/50 hover:bg-ocean-800/80 rounded-lg px-3 py-2 transition-colors">
                           <span className={`text-xs font-mono mt-0.5 shrink-0 opacity-40 ${color}`}>{String(idx+1).padStart(2,"0")}</span>
 
                           {editingId === iid ? (
                             <div className="flex-1 flex gap-2">
                               <input value={editingContent} onChange={e => setEditingContent(e.target.value)}
                                 onKeyDown={e => { if (e.key==="Enter") updateItem(iid); if (e.key==="Escape") setEditingId(null); }}
-                                className="flex-1 bg-slate-700 border border-violet-500 rounded px-2 py-0.5 text-white text-sm focus:outline-none" autoFocus />
+                                className="flex-1 bg-ocean-700 border border-brand-500 rounded px-2 py-0.5 text-white text-sm focus:outline-none" autoFocus />
                               <button onClick={() => updateItem(iid)} className="text-green-400 text-xs"><Check size={14} /></button>
-                              <button onClick={() => setEditingId(null)} className="text-slate-400 text-xs"><X size={14} /></button>
+                              <button onClick={() => setEditingId(null)} className="text-ocean-400 text-xs"><X size={14} /></button>
                             </div>
                           ) : isPreview ? (
                             <div className="flex-1 flex gap-1">
@@ -543,18 +543,18 @@ export default function DofaPage() {
                                   arr[idx] = e.target.value;
                                   setPendingItems(p => ({ ...p, [type]: arr }));
                                 }}
-                                className="flex-1 bg-transparent text-sm text-slate-200 focus:outline-none focus:text-white min-w-0"
+                                className="flex-1 bg-transparent text-sm text-ocean-200 focus:outline-none focus:text-white min-w-0"
                               />
                               <button onClick={() => setPendingItems(p => ({ ...p, [type]: (p[type]??[]).filter((_,i)=>i!==idx) }))}
-                                className="text-slate-600 hover:text-red-400 text-xs opacity-0 group-hover:opacity-100 shrink-0"><X size={14} /></button>
+                                className="text-ocean-600 hover:text-red-400 text-xs opacity-0 group-hover:opacity-100 shrink-0"><X size={14} /></button>
                             </div>
                           ) : (
                             <div className="flex-1 flex items-start justify-between gap-1 min-w-0">
-                              <span className="text-sm text-slate-200 leading-snug">{content}</span>
+                              <span className="text-sm text-ocean-200 leading-snug">{content}</span>
                               <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0 ml-1">
-                                {isAI && <span className="text-xs text-violet-400 bg-violet-900/30 px-1 rounded">IA</span>}
-                                <button onClick={() => { setEditingId(iid); setEditingContent(content); }} className="text-slate-500 hover:text-blue-400 text-xs"><Pencil size={14} /></button>
-                                <button onClick={() => deleteItem(iid, type)} className="text-slate-500 hover:text-red-400 text-xs"><X size={14} /></button>
+                                {isAI && <span className="text-xs text-brand-400 bg-brand-900/30 px-1 rounded">IA</span>}
+                                <button onClick={() => { setEditingId(iid); setEditingContent(content); }} className="text-ocean-500 hover:text-blue-400 text-xs"><Pencil size={14} /></button>
+                                <button onClick={() => deleteItem(iid, type)} className="text-ocean-500 hover:text-red-400 text-xs"><X size={14} /></button>
                               </div>
                             </div>
                           )}
@@ -563,7 +563,7 @@ export default function DofaPage() {
                     })}
 
                     {dispItems.length === 0 && (
-                      <li className="text-slate-600 text-sm italic text-center py-6">
+                      <li className="text-ocean-600 text-sm italic text-center py-6">
                         {isPreview ? "Sin ítems generados" : "Agrega ítems o genera con IA"}
                       </li>
                     )}
@@ -573,7 +573,7 @@ export default function DofaPage() {
                   {isPreview ? (
                     <button
                       onClick={() => setPendingItems(p => ({ ...p, [type]: [...(p[type]??[]), ""] }))}
-                      className="w-full text-xs text-slate-600 hover:text-slate-400 border border-dashed border-slate-700 hover:border-slate-600 rounded-lg py-2 transition-colors"
+                      className="w-full text-xs text-ocean-600 hover:text-ocean-400 border border-dashed border-ocean-700 hover:border-ocean-600 rounded-lg py-2 transition-colors"
                     >+ Agregar ítem</button>
                   ) : (
                     <div className="flex gap-2">
@@ -581,9 +581,9 @@ export default function DofaPage() {
                         onChange={e => setNewTexts(p => ({ ...p, [type]: e.target.value }))}
                         onKeyDown={e => { if (e.key==="Enter") addItem(type); }}
                         placeholder={placeholder}
-                        className="flex-1 bg-slate-800 border border-slate-700/80 rounded-lg px-3 py-1.5 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-violet-500"
+                        className="flex-1 bg-ocean-800 border border-ocean-700/80 rounded-lg px-3 py-1.5 text-sm text-white placeholder-ocean-600 focus:outline-none focus:border-brand-500"
                       />
-                      <button onClick={() => addItem(type)} className="bg-slate-700 hover:bg-slate-600 text-white px-3 rounded-lg text-sm transition-colors">+</button>
+                      <button onClick={() => addItem(type)} className="bg-ocean-700 hover:bg-ocean-600 text-white px-3 rounded-lg text-sm transition-colors">+</button>
                     </div>
                   )}
                 </div>
@@ -599,7 +599,7 @@ export default function DofaPage() {
       {activeTab === "strategies" && (
         <div className="space-y-3">
           {preview && (
-            <div className="bg-slate-800/50 border border-violet-500/30 rounded-xl px-4 py-3 text-sm text-violet-300">
+            <div className="bg-ocean-800/50 border border-brand-500/30 rounded-xl px-4 py-3 text-sm text-brand-300">
               Revisa las estrategias generadas por IA y edítalas antes de guardar.
             </div>
           )}
@@ -621,32 +621,32 @@ export default function DofaPage() {
                   <div className="flex items-center gap-3">
                     <div>
                       <div className="font-bold text-white">{label}</div>
-                      <div className="text-xs text-slate-500">{logic} · {desc}</div>
+                      <div className="text-xs text-ocean-500">{logic} · {desc}</div>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className="text-xs text-slate-400">{dispItems.length} acción{dispItems.length !== 1 ? "es" : ""}</span>
-                    <span className="text-slate-500">{isExpanded ? "▲" : "▼"}</span>
+                    <span className="text-xs text-ocean-400">{dispItems.length} acción{dispItems.length !== 1 ? "es" : ""}</span>
+                    <span className="text-ocean-500">{isExpanded ? "▲" : "▼"}</span>
                   </div>
                 </button>
 
                 {isExpanded && (
-                  <div className="border-t border-slate-700/40 px-5 py-4 space-y-2">
+                  <div className="border-t border-ocean-700/40 px-5 py-4 space-y-2">
                     {dispItems.map((content, idx) => {
                       const dbItem = !isPreview ? dbItems[idx] : null;
                       const iid    = dbItem?.id ?? `ps-${type}-${idx}`;
 
                       return (
-                        <div key={iid} className="group flex items-start gap-2 bg-slate-800/40 hover:bg-slate-800/70 rounded-lg px-4 py-3 transition-colors">
-                          <span className="text-xs text-slate-600 font-mono mt-0.5 shrink-0">{String(idx+1).padStart(2,"0")}</span>
+                        <div key={iid} className="group flex items-start gap-2 bg-ocean-800/40 hover:bg-ocean-800/70 rounded-lg px-4 py-3 transition-colors">
+                          <span className="text-xs text-ocean-600 font-mono mt-0.5 shrink-0">{String(idx+1).padStart(2,"0")}</span>
 
                           {editingId === iid ? (
                             <div className="flex-1 flex gap-2">
                               <input value={editingContent} onChange={e => setEditingContent(e.target.value)}
                                 onKeyDown={e => { if (e.key==="Enter") updateItem(iid); if (e.key==="Escape") setEditingId(null); }}
-                                className="flex-1 bg-slate-700 border border-violet-500 rounded px-2 py-1 text-white text-sm focus:outline-none" autoFocus />
+                                className="flex-1 bg-ocean-700 border border-brand-500 rounded px-2 py-1 text-white text-sm focus:outline-none" autoFocus />
                               <button onClick={() => updateItem(iid)} className="text-green-400 text-xs"><Check size={14} /></button>
-                              <button onClick={() => setEditingId(null)} className="text-slate-400 text-xs"><X size={14} /></button>
+                              <button onClick={() => setEditingId(null)} className="text-ocean-400 text-xs"><X size={14} /></button>
                             </div>
                           ) : isPreview ? (
                             <div className="flex-1 flex gap-1">
@@ -656,18 +656,18 @@ export default function DofaPage() {
                                   arr[idx] = e.target.value;
                                   setPendingStrats(p => ({ ...p, [type]: arr }));
                                 }}
-                                className="flex-1 bg-transparent text-sm text-slate-200 focus:outline-none"
+                                className="flex-1 bg-transparent text-sm text-ocean-200 focus:outline-none"
                               />
                               <button onClick={() => setPendingStrats(p => ({ ...p, [type]: (p[type]??[]).filter((_,i)=>i!==idx) }))}
-                                className="text-slate-600 hover:text-red-400 text-xs opacity-0 group-hover:opacity-100 shrink-0"><X size={14} /></button>
+                                className="text-ocean-600 hover:text-red-400 text-xs opacity-0 group-hover:opacity-100 shrink-0"><X size={14} /></button>
                             </div>
                           ) : (
                             <div className="flex-1 flex items-start justify-between gap-2">
-                              <span className="text-sm text-slate-200 leading-snug">{content}</span>
+                              <span className="text-sm text-ocean-200 leading-snug">{content}</span>
                               <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
-                                {dbItem?.source === "ai" && <span className="text-xs text-violet-400">IA</span>}
-                                <button onClick={() => { setEditingId(iid); setEditingContent(content); }} className="text-slate-500 hover:text-blue-400 text-xs"><Pencil size={14} /></button>
-                                <button onClick={() => deleteItem(iid, type)} className="text-slate-500 hover:text-red-400 text-xs"><X size={14} /></button>
+                                {dbItem?.source === "ai" && <span className="text-xs text-brand-400">IA</span>}
+                                <button onClick={() => { setEditingId(iid); setEditingContent(content); }} className="text-ocean-500 hover:text-blue-400 text-xs"><Pencil size={14} /></button>
+                                <button onClick={() => deleteItem(iid, type)} className="text-ocean-500 hover:text-red-400 text-xs"><X size={14} /></button>
                               </div>
                             </div>
                           )}
@@ -676,13 +676,13 @@ export default function DofaPage() {
                     })}
 
                     {dispItems.length === 0 && (
-                      <div className="text-slate-600 text-sm italic text-center py-4">Sin estrategias aún</div>
+                      <div className="text-ocean-600 text-sm italic text-center py-4">Sin estrategias aún</div>
                     )}
 
                     {isPreview ? (
                       <button
                         onClick={() => setPendingStrats(p => ({ ...p, [type]: [...(p[type]??[]), ""] }))}
-                        className="w-full text-xs text-slate-600 hover:text-slate-400 border border-dashed border-slate-700 rounded-lg py-2 mt-1 transition-colors"
+                        className="w-full text-xs text-ocean-600 hover:text-ocean-400 border border-dashed border-ocean-700 rounded-lg py-2 mt-1 transition-colors"
                       >+ Agregar acción</button>
                     ) : (
                       <div className="flex gap-2 mt-1">
@@ -690,9 +690,9 @@ export default function DofaPage() {
                           onChange={e => setNewTexts(p => ({ ...p, [type]: e.target.value }))}
                           onKeyDown={e => { if (e.key==="Enter") addItem(type); }}
                           placeholder="Agregar acción estratégica..."
-                          className="flex-1 bg-slate-800 border border-slate-700/80 rounded-lg px-3 py-1.5 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-violet-500"
+                          className="flex-1 bg-ocean-800 border border-ocean-700/80 rounded-lg px-3 py-1.5 text-sm text-white placeholder-ocean-600 focus:outline-none focus:border-brand-500"
                         />
-                        <button onClick={() => addItem(type)} className="bg-slate-700 hover:bg-slate-600 text-white px-3 rounded-lg text-sm transition-colors">+</button>
+                        <button onClick={() => addItem(type)} className="bg-ocean-700 hover:bg-ocean-600 text-white px-3 rounded-lg text-sm transition-colors">+</button>
                       </div>
                     )}
                   </div>
@@ -708,18 +708,18 @@ export default function DofaPage() {
       ════════════════════════════════════════════════════════════════════*/}
       {activeTab === "scorecard" && (
         <div className="space-y-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden">
-            <div className="px-5 py-4 border-b border-slate-800 flex items-center justify-between">
+          <div className="bg-ocean-900 border border-ocean-800 rounded-2xl overflow-hidden">
+            <div className="px-5 py-4 border-b border-ocean-800 flex items-center justify-between">
               <div>
                 <div className="font-semibold text-white">Scorecard Semanal</div>
-                <div className="text-xs text-slate-500 mt-0.5">Actualiza cada domingo · Ingresa tus resultados de la semana</div>
+                <div className="text-xs text-ocean-500 mt-0.5">Actualiza cada domingo · Ingresa tus resultados de la semana</div>
               </div>
-              <button onClick={() => setActuals({})} className="text-xs text-slate-600 hover:text-slate-400 border border-slate-700 rounded-lg px-3 py-1.5 transition-colors">
+              <button onClick={() => setActuals({})} className="text-xs text-ocean-600 hover:text-ocean-400 border border-ocean-700 rounded-lg px-3 py-1.5 transition-colors">
                 Limpiar semana
               </button>
             </div>
 
-            <div className="divide-y divide-slate-800/60">
+            <div className="divide-y divide-ocean-800/60">
               {SCORECARD_ROWS.map((row, i) => {
                 const raw = actuals[i] ?? "";
                 const pct = scorePct(row.rule, row.target, raw);
@@ -731,8 +731,8 @@ export default function DofaPage() {
                     <div className="flex items-center gap-4">
                       <div className="flex-1 min-w-0">
                         <div className="text-sm text-white font-medium">{row.label}</div>
-                        <div className="text-xs text-slate-500 mt-0.5">
-                          Regla: <span className="text-slate-300">{row.rule} {row.target}</span>
+                        <div className="text-xs text-ocean-500 mt-0.5">
+                          Regla: <span className="text-ocean-300">{row.rule} {row.target}</span>
                         </div>
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
@@ -740,7 +740,7 @@ export default function DofaPage() {
                           type="number" step="0.5" min="0" value={raw}
                           onChange={e => setActuals(p => ({ ...p, [i]: e.target.value }))}
                           placeholder="—"
-                          className="w-20 bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-white text-sm text-center focus:outline-none focus:border-violet-500 tabular-nums"
+                          className="w-20 bg-ocean-800 border border-ocean-700 rounded-lg px-3 py-1.5 text-white text-sm text-center focus:outline-none focus:border-brand-500 tabular-nums"
                         />
                         {pct !== null && (
                           <>
@@ -753,7 +753,7 @@ export default function DofaPage() {
                       </div>
                     </div>
                     {pct !== null && (
-                      <div className="mt-2 h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                      <div className="mt-2 h-1.5 bg-ocean-800 rounded-full overflow-hidden">
                         <div className={`h-full rounded-full transition-all ${barColor}`} style={{ width: `${Math.min(pct, 100)}%` }} />
                       </div>
                     )}
@@ -763,7 +763,7 @@ export default function DofaPage() {
             </div>
 
             {/* Summary footer */}
-            <div className="px-5 py-4 bg-slate-800/30 border-t border-slate-700/60 flex items-center justify-between">
+            <div className="px-5 py-4 bg-ocean-800/30 border-t border-ocean-700/60 flex items-center justify-between">
               <div>
                 <div className="text-sm font-semibold text-white">
                   {(() => {
@@ -778,7 +778,7 @@ export default function DofaPage() {
                     return `${green} / ${filled} indicadores en verde (${pctGreen}%)`;
                   })()}
                 </div>
-                <div className="text-xs text-slate-500 mt-0.5">{SCORECARD_ROWS.length} indicadores totales</div>
+                <div className="text-xs text-ocean-500 mt-0.5">{SCORECARD_ROWS.length} indicadores totales</div>
               </div>
               {Object.keys(actuals).length > 0 && (
                 <div className={`text-2xl font-black tabular-nums ${
@@ -789,7 +789,7 @@ export default function DofaPage() {
                       if (isNaN(v)) return false;
                       return row.rule === "≤" ? v <= row.target : v >= row.target;
                     }).length;
-                    if (filled === 0) return "text-slate-500";
+                    if (filled === 0) return "text-ocean-500";
                     const p = Math.round((green / filled) * 100);
                     return p >= 80 ? "text-green-400" : p >= 60 ? "text-yellow-400" : "text-red-400";
                   })()
@@ -809,8 +809,8 @@ export default function DofaPage() {
             </div>
           </div>
 
-          <div className="bg-slate-900 border border-violet-500/20 rounded-xl px-5 py-4 text-sm text-slate-400">
-            <span className="text-violet-400 font-medium">Tip:</span> Este scorecard es de sesión. Para guardar tus métricas semanales permanentemente, usa el módulo de <strong className="text-white">Revisión Semanal</strong> en el Dashboard principal.
+          <div className="bg-ocean-900 border border-brand-500/20 rounded-xl px-5 py-4 text-sm text-ocean-400">
+            <span className="text-brand-400 font-medium">Tip:</span> Este scorecard es de sesión. Para guardar tus métricas semanales permanentemente, usa el módulo de <strong className="text-white">Revisión Semanal</strong> en el Dashboard principal.
           </div>
         </div>
       )}

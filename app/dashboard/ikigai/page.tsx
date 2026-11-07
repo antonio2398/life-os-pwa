@@ -336,7 +336,7 @@ Responde SOLO con la declaración, sin explicaciones ni comillas extra.`;
 
   if (loading) return (
     <div className="flex items-center justify-center h-64">
-      <div className="text-slate-400 animate-pulse">Cargando tu IKIGAI...</div>
+      <div className="text-ocean-400 animate-pulse">Cargando tu IKIGAI...</div>
     </div>
   );
 
@@ -347,9 +347,9 @@ Responde SOLO con la declaración, sin explicaciones ni comillas extra.`;
       <div className="flex items-start justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold text-white">IKIGAI</h2>
-          <p className="text-slate-400 text-sm mt-1">Tu razón de ser, descubierta con preguntas guiadas. Revisar cada 6 meses.</p>
+          <p className="text-ocean-400 text-sm mt-1">Tu razón de ser, descubierta con preguntas guiadas. Revisar cada 6 meses.</p>
           {data.updated_at && (
-            <p className="text-xs text-slate-600 mt-0.5">
+            <p className="text-xs text-ocean-600 mt-0.5">
               Actualizado: {new Date(data.updated_at).toLocaleDateString("es-MX", { day: "numeric", month: "long", year: "numeric" })}
             </p>
           )}
@@ -357,29 +357,29 @@ Responde SOLO con la declaración, sin explicaciones ni comillas extra.`;
         <div className="flex items-center gap-2">
           {isComplete && <span className="text-xs text-green-400 bg-green-900/30 border border-green-500/30 px-2.5 py-1 rounded-full">IKIGAI completo</span>}
           <button onClick={() => save()} disabled={saving}
-            className="bg-violet-600 hover:bg-violet-700 disabled:opacity-50 text-white px-5 py-2 rounded-xl text-sm font-medium transition-colors">
+            className="bg-brand-600 hover:bg-brand-700 disabled:opacity-50 text-white px-5 py-2 rounded-xl text-sm font-medium transition-colors">
             {saving ? "Guardando..." : saved ? "Guardado" : "Guardar"}
           </button>
         </div>
       </div>
 
       {/* ── PROGRESS ─────────────────────────────────────────────────────────*/}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex items-center gap-4">
-        <div className="text-xs text-slate-500 shrink-0">Progreso:</div>
+      <div className="bg-ocean-900 border border-ocean-800 rounded-2xl p-4 flex items-center gap-4">
+        <div className="text-xs text-ocean-500 shrink-0">Progreso:</div>
         <div className="flex gap-3 flex-1">
           {(Object.entries(QUADRANT_META) as [QuadrantKey, typeof QUADRANT_META[QuadrantKey]][]).map(([key, meta]) => (
             <div key={key} className="flex-1 text-center">
-              <div className={`text-lg font-black ${data[key].length >= 2 ? meta.color : "text-slate-600"}`}>{data[key].length}</div>
-              <div className="text-xs text-slate-600 mt-0.5">ítems</div>
-              <div className={`h-1 rounded-full mt-1 ${data[key].length >= 2 ? "bg-violet-500" : "bg-slate-700"}`} />
+              <div className={`text-lg font-black ${data[key].length >= 2 ? meta.color : "text-ocean-600"}`}>{data[key].length}</div>
+              <div className="text-xs text-ocean-600 mt-0.5">ítems</div>
+              <div className={`h-1 rounded-full mt-1 ${data[key].length >= 2 ? "bg-brand-500" : "bg-ocean-700"}`} />
             </div>
           ))}
         </div>
-        <div className="text-xs text-slate-500 shrink-0">{totalItems} total</div>
+        <div className="text-xs text-ocean-500 shrink-0">{totalItems} total</div>
       </div>
 
       {/* ── VIEW TOGGLE ──────────────────────────────────────────────────────*/}
-      <div className="flex gap-1 bg-slate-900 border border-slate-800 rounded-xl p-1">
+      <div className="flex gap-1 bg-ocean-900 border border-ocean-800 rounded-xl p-1">
         {([
           ["guided",    "Guiado con IA"],
           ["manual",    "Edición manual"],
@@ -387,7 +387,7 @@ Responde SOLO con la declaración, sin explicaciones ni comillas extra.`;
         ] as [typeof activeView, string][]).map(([v, label]) => (
           <button key={v} onClick={() => setActiveView(v)}
             className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${
-              activeView === v ? "bg-violet-600 text-white" : "text-slate-400 hover:text-white"
+              activeView === v ? "bg-brand-600 text-white" : "text-ocean-400 hover:text-white"
             }`}>{label}</button>
         ))}
       </div>
@@ -399,9 +399,9 @@ Responde SOLO con la declaración, sin explicaciones ni comillas extra.`;
         <div className="space-y-4">
           {/* Intro if nothing started */}
           {!guidedQuadrant && (
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 text-center">
+            <div className="bg-ocean-900 border border-ocean-800 rounded-2xl p-6 text-center">
               <div className="text-white font-semibold text-lg mb-2">Descubre tu IKIGAI respondiendo preguntas</div>
-              <p className="text-slate-400 text-sm max-w-md mx-auto mb-6">
+              <p className="text-ocean-400 text-sm max-w-md mx-auto mb-6">
                 En lugar de pensar en categorías abstractas, responde preguntas concretas sobre tu vida. La IA extrae los ítems automáticamente de tus respuestas.
               </p>
               <div className="grid grid-cols-2 gap-3 max-w-md mx-auto">
@@ -409,7 +409,7 @@ Responde SOLO con la declaración, sin explicaciones ni comillas extra.`;
                   <button key={key} onClick={() => { setGuidedQuadrant(key); setGuidedStep(0); setGuidedAnswer(""); setExtracted([]); }}
                     className={`border rounded-xl p-4 text-left transition-all hover:scale-[1.02] ${meta.border} ${meta.bg}`}>
                     <div className="font-medium text-white text-sm mb-0.5">{meta.label}</div>
-                    <div className="text-xs text-slate-500">{meta.desc}</div>
+                    <div className="text-xs text-ocean-500">{meta.desc}</div>
                     <div className={`text-xs mt-2 ${meta.color}`}>
                       {data[key].length > 0 ? `${data[key].length} ítems` : "Sin responder"}
                     </div>
@@ -427,12 +427,12 @@ Responde SOLO con la declaración, sin explicaciones ni comillas extra.`;
                 <div className="flex items-center justify-between mb-4">
                   <div>
                     <div className={`font-bold text-lg ${QUADRANT_META[guidedQuadrant].color}`}>{QUADRANT_META[guidedQuadrant].label}</div>
-                    <div className="text-xs text-slate-500 mt-0.5">{QUADRANT_META[guidedQuadrant].desc}</div>
+                    <div className="text-xs text-ocean-500 mt-0.5">{QUADRANT_META[guidedQuadrant].desc}</div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <div className="text-xs text-slate-500">Pregunta {guidedStep + 1} / {GUIDED_QUESTIONS[guidedQuadrant].length}</div>
+                    <div className="text-xs text-ocean-500">Pregunta {guidedStep + 1} / {GUIDED_QUESTIONS[guidedQuadrant].length}</div>
                     <button onClick={() => { setGuidedQuadrant(null); setGuidedStep(0); setGuidedAnswer(""); }}
-                      className="text-slate-500 hover:text-slate-300 text-xs border border-slate-700 px-2 py-1 rounded transition-colors">← Volver</button>
+                      className="text-ocean-500 hover:text-ocean-300 text-xs border border-ocean-700 px-2 py-1 rounded transition-colors">← Volver</button>
                   </div>
                 </div>
 
@@ -440,17 +440,17 @@ Responde SOLO con la declaración, sin explicaciones ni comillas extra.`;
                 <div className="flex gap-1.5 mb-5">
                   {GUIDED_QUESTIONS[guidedQuadrant].map((_, i) => (
                     <div key={i} className={`h-1.5 flex-1 rounded-full transition-all ${
-                      i < guidedStep ? "bg-violet-500" : i === guidedStep ? "bg-violet-400" : "bg-slate-700"
+                      i < guidedStep ? "bg-brand-500" : i === guidedStep ? "bg-brand-400" : "bg-ocean-700"
                     }`} />
                   ))}
                 </div>
 
                 {/* Question */}
-                <div className="bg-slate-900/60 rounded-xl p-4 mb-4">
+                <div className="bg-ocean-900/60 rounded-xl p-4 mb-4">
                   <p className="text-white font-medium text-base leading-relaxed">
                     {GUIDED_QUESTIONS[guidedQuadrant][guidedStep].question}
                   </p>
-                  <p className="text-slate-500 text-xs mt-2 italic">
+                  <p className="text-ocean-500 text-xs mt-2 italic">
                     {GUIDED_QUESTIONS[guidedQuadrant][guidedStep].example}
                   </p>
                 </div>
@@ -459,8 +459,8 @@ Responde SOLO con la declaración, sin explicaciones ni comillas extra.`;
                 {(guidedAnswers[guidedQuadrant]?.length ?? 0) > 0 && (
                   <div className="mb-4 space-y-1">
                     {guidedAnswers[guidedQuadrant]?.map((a, i) => (
-                      <div key={i} className="text-xs text-slate-500 flex gap-2">
-                        <span className="text-slate-600 shrink-0">P{i+1}:</span>
+                      <div key={i} className="text-xs text-ocean-500 flex gap-2">
+                        <span className="text-ocean-600 shrink-0">P{i+1}:</span>
                         <span className="truncate">{a.answer.slice(0, 80)}{a.answer.length > 80 ? "..." : ""}</span>
                       </div>
                     ))}
@@ -473,7 +473,7 @@ Responde SOLO con la declaración, sin explicaciones ni comillas extra.`;
                   onChange={e => setGuidedAnswer(e.target.value)}
                   rows={4}
                   placeholder="Escribe tu respuesta aquí, con la mayor honestidad posible. No hay respuestas correctas ni incorrectas..."
-                  className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white placeholder-slate-600 focus:outline-none focus:border-violet-500 resize-none text-sm"
+                  className="w-full bg-ocean-800 border border-ocean-700 rounded-xl px-4 py-3 text-white placeholder-ocean-600 focus:outline-none focus:border-brand-500 resize-none text-sm"
                   autoFocus
                 />
 
@@ -481,7 +481,7 @@ Responde SOLO con la declaración, sin explicaciones ni comillas extra.`;
                   <button
                     onClick={submitGuidedAnswer}
                     disabled={!guidedAnswer.trim()}
-                    className="bg-violet-600 hover:bg-violet-700 disabled:opacity-40 text-white px-6 py-2.5 rounded-xl text-sm font-medium transition-colors"
+                    className="bg-brand-600 hover:bg-brand-700 disabled:opacity-40 text-white px-6 py-2.5 rounded-xl text-sm font-medium transition-colors"
                   >
                     {guidedStep >= GUIDED_QUESTIONS[guidedQuadrant].length - 1 || (guidedAnswers[guidedQuadrant]?.length ?? 0) >= 1
                       ? "Extraer ítems con IA"
@@ -491,7 +491,7 @@ Responde SOLO con la declaración, sin explicaciones ni comillas extra.`;
                     <button
                       onClick={submitGuidedAnswer}
                       disabled={!guidedAnswer.trim()}
-                      className="text-slate-400 hover:text-white text-sm px-4 py-2 rounded-xl border border-slate-700 transition-colors"
+                      className="text-ocean-400 hover:text-white text-sm px-4 py-2 rounded-xl border border-ocean-700 transition-colors"
                     >
                       Extraer con lo que tengo
                     </button>
@@ -503,10 +503,10 @@ Responde SOLO con la declaración, sin explicaciones ni comillas extra.`;
 
           {/* AI extracting spinner */}
           {aiExtracting && (
-            <div className="bg-slate-900 border border-violet-500/40 rounded-2xl p-8 text-center">
-              <div className="w-10 h-10 border-4 border-violet-500/30 border-t-violet-500 rounded-full animate-spin mx-auto mb-4" />
+            <div className="bg-ocean-900 border border-brand-500/40 rounded-2xl p-8 text-center">
+              <div className="w-10 h-10 border-4 border-brand-500/30 border-t-brand-500 rounded-full animate-spin mx-auto mb-4" />
               <div className="text-white font-medium">Analizando tus respuestas...</div>
-              <div className="text-slate-400 text-sm mt-1">La IA está extrayendo los ítems de tu IKIGAI</div>
+              <div className="text-ocean-400 text-sm mt-1">La IA está extrayendo los ítems de tu IKIGAI</div>
             </div>
           )}
 
@@ -516,21 +516,21 @@ Responde SOLO con la declaración, sin explicaciones ni comillas extra.`;
               <div className="flex items-center justify-between">
                 <div>
                   <div className={`font-bold ${QUADRANT_META[guidedQuadrant].color}`}>{QUADRANT_META[guidedQuadrant].label}</div>
-                  <div className="text-xs text-slate-400 mt-0.5">La IA extrajo estos ítems de tus respuestas. Edítalos si es necesario.</div>
+                  <div className="text-xs text-ocean-400 mt-0.5">La IA extrajo estos ítems de tus respuestas. Edítalos si es necesario.</div>
                 </div>
               </div>
 
               <div className="space-y-2">
                 {extracted.map((item, i) => (
-                  <div key={i} className="flex items-center gap-2 bg-slate-800/60 rounded-lg px-3 py-2">
-                    <span className="text-violet-400 text-xs font-mono shrink-0">{String(i+1).padStart(2,"0")}</span>
+                  <div key={i} className="flex items-center gap-2 bg-ocean-800/60 rounded-lg px-3 py-2">
+                    <span className="text-brand-400 text-xs font-mono shrink-0">{String(i+1).padStart(2,"0")}</span>
                     <input
                       value={item}
                       onChange={e => setExtracted(prev => prev.map((v, idx) => idx === i ? e.target.value : v))}
                       className="flex-1 bg-transparent text-sm text-white focus:outline-none"
                     />
                     <button onClick={() => setExtracted(prev => prev.filter((_, idx) => idx !== i))}
-                      className="text-slate-600 hover:text-red-400 text-xs shrink-0"><X size={14} /></button>
+                      className="text-ocean-600 hover:text-red-400 text-xs shrink-0"><X size={14} /></button>
                   </div>
                 ))}
               </div>
@@ -538,16 +538,16 @@ Responde SOLO con la declaración, sin explicaciones ni comillas extra.`;
               <div className="flex gap-2">
                 <button
                   onClick={() => acceptExtracted(guidedQuadrant, extracted)}
-                  className="bg-violet-600 hover:bg-violet-700 text-white px-6 py-2.5 rounded-xl text-sm font-medium transition-colors"
+                  className="bg-brand-600 hover:bg-brand-700 text-white px-6 py-2.5 rounded-xl text-sm font-medium transition-colors"
                 >
                   Agregar al IKIGAI ({extracted.length} ítems)
                 </button>
                 <button onClick={() => { setExtracted([]); setGuidedAnswer(""); setGuidedStep(prev => Math.min(prev+1, GUIDED_QUESTIONS[guidedQuadrant].length-1)); }}
-                  className="text-slate-400 hover:text-white text-sm px-4 py-2 rounded-xl border border-slate-700 transition-colors">
+                  className="text-ocean-400 hover:text-white text-sm px-4 py-2 rounded-xl border border-ocean-700 transition-colors">
                   Responder más preguntas
                 </button>
                 <button onClick={() => { setGuidedQuadrant(null); setExtracted([]); setGuidedAnswers({}); }}
-                  className="text-slate-500 hover:text-slate-300 text-sm px-4 py-2 rounded-xl transition-colors">
+                  className="text-ocean-500 hover:text-ocean-300 text-sm px-4 py-2 rounded-xl transition-colors">
                   Cancelar
                 </button>
               </div>
@@ -562,18 +562,18 @@ Responde SOLO con la declaración, sin explicaciones ni comillas extra.`;
                   <div className="flex items-center justify-between mb-3">
                     <div className={`font-semibold text-white text-sm`}>{meta.label}</div>
                     <button onClick={() => { setGuidedQuadrant(key); setGuidedStep(0); setGuidedAnswer(""); setExtracted([]); }}
-                      className={`text-xs ${meta.color} border rounded-lg px-2.5 py-1 transition-colors hover:bg-slate-800`}
+                      className={`text-xs ${meta.color} border rounded-lg px-2.5 py-1 transition-colors hover:bg-ocean-800`}
                       style={{ borderColor: `${meta.color.replace("text-","color:")}40` }}>
                       {data[key].length > 0 ? "+ Agregar más" : "Responder →"}
                     </button>
                   </div>
                   {data[key].length === 0 ? (
-                    <div className="text-slate-600 text-xs italic py-4 text-center">Sin ítems todavía</div>
+                    <div className="text-ocean-600 text-xs italic py-4 text-center">Sin ítems todavía</div>
                   ) : (
                     <ul className="space-y-1">
                       {data[key].map((item, i) => (
-                        <li key={i} className="text-xs text-slate-300 flex gap-1.5">
-                          <span className="text-slate-600 shrink-0">•</span>{item}
+                        <li key={i} className="text-xs text-ocean-300 flex gap-1.5">
+                          <span className="text-ocean-600 shrink-0">•</span>{item}
                         </li>
                       ))}
                     </ul>
@@ -595,48 +595,48 @@ Responde SOLO con la declaración, sin explicaciones ni comillas extra.`;
               <div key={key} className={`border rounded-2xl p-5 ${meta.border} ${meta.bg}`}>
                 <div className="mb-3">
                   <div className="font-semibold text-white">{meta.label}</div>
-                  <div className="text-xs text-slate-500 mt-0.5">{meta.desc}</div>
+                  <div className="text-xs text-ocean-500 mt-0.5">{meta.desc}</div>
                 </div>
 
                 <ul className="space-y-1.5 mb-3 min-h-[60px]">
                   {data[key].map((item, i) => (
-                    <li key={i} className="group flex items-center gap-2 bg-slate-800/50 rounded-lg px-3 py-2">
+                    <li key={i} className="group flex items-center gap-2 bg-ocean-800/50 rounded-lg px-3 py-2">
                       {editingKey === key && editingIdx === i ? (
                         <div className="flex-1 flex gap-2">
                           <input value={editingVal} onChange={e => setEditingVal(e.target.value)}
                             onKeyDown={e => { if (e.key==="Enter") saveEdit(key,i); if (e.key==="Escape") { setEditingKey(null); setEditingIdx(null); } }}
-                            className="flex-1 bg-slate-700 border border-violet-500 rounded px-2 py-0.5 text-white text-sm focus:outline-none" autoFocus />
+                            className="flex-1 bg-ocean-700 border border-brand-500 rounded px-2 py-0.5 text-white text-sm focus:outline-none" autoFocus />
                           <button onClick={() => saveEdit(key,i)} className="text-green-400 text-xs"><Check size={14} /></button>
-                          <button onClick={() => { setEditingKey(null); setEditingIdx(null); }} className="text-slate-400 text-xs"><X size={14} /></button>
+                          <button onClick={() => { setEditingKey(null); setEditingIdx(null); }} className="text-ocean-400 text-xs"><X size={14} /></button>
                         </div>
                       ) : (
                         <div className="flex-1 flex items-center justify-between gap-2">
-                          <span className="text-sm text-slate-200 flex-1">• {item}</span>
+                          <span className="text-sm text-ocean-200 flex-1">• {item}</span>
                           <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button onClick={() => { setEditingKey(key); setEditingIdx(i); setEditingVal(item); }} className="text-slate-500 hover:text-blue-400 text-xs"><Pencil size={14} /></button>
-                            <button onClick={() => removeItem(key,i)} className="text-slate-500 hover:text-red-400 text-xs"><X size={14} /></button>
+                            <button onClick={() => { setEditingKey(key); setEditingIdx(i); setEditingVal(item); }} className="text-ocean-500 hover:text-blue-400 text-xs"><Pencil size={14} /></button>
+                            <button onClick={() => removeItem(key,i)} className="text-ocean-500 hover:text-red-400 text-xs"><X size={14} /></button>
                           </div>
                         </div>
                       )}
                     </li>
                   ))}
-                  {data[key].length === 0 && <li className="text-slate-600 text-xs italic text-center py-3">Sin ítems</li>}
+                  {data[key].length === 0 && <li className="text-ocean-600 text-xs italic text-center py-3">Sin ítems</li>}
                 </ul>
 
                 <div className="flex gap-2">
                   <input value={newItem[key] ?? ""} onChange={e => setNewItem(p => ({ ...p, [key]: e.target.value }))}
                     onKeyDown={e => { if (e.key==="Enter") addManualItem(key); }}
                     placeholder="Agregar ítem..."
-                    className="flex-1 bg-slate-800 border border-slate-700/80 rounded-lg px-3 py-1.5 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-violet-500"
+                    className="flex-1 bg-ocean-800 border border-ocean-700/80 rounded-lg px-3 py-1.5 text-sm text-white placeholder-ocean-600 focus:outline-none focus:border-brand-500"
                   />
-                  <button onClick={() => addManualItem(key)} className="bg-slate-700 hover:bg-slate-600 text-white px-3 rounded-lg text-sm transition-colors">+</button>
+                  <button onClick={() => addManualItem(key)} className="bg-ocean-700 hover:bg-ocean-600 text-white px-3 rounded-lg text-sm transition-colors">+</button>
                 </div>
               </div>
             ))}
           </div>
 
           <button onClick={() => save()} disabled={saving}
-            className="w-full bg-violet-600 hover:bg-violet-700 disabled:opacity-50 text-white py-3 rounded-xl font-medium transition-colors">
+            className="w-full bg-brand-600 hover:bg-brand-700 disabled:opacity-50 text-white py-3 rounded-xl font-medium transition-colors">
             {saving ? "Guardando..." : saved ? "Guardado" : "Guardar cambios"}
           </button>
         </div>
@@ -650,26 +650,26 @@ Responde SOLO con la declaración, sin explicaciones ni comillas extra.`;
           {/* Intersections */}
           <div className="grid grid-cols-4 gap-3">
             {INTERSECTIONS.map(int => (
-              <div key={int.label} className="bg-slate-900 border border-slate-700 rounded-xl p-4 text-center">
+              <div key={int.label} className="bg-ocean-900 border border-ocean-700 rounded-xl p-4 text-center">
                 <div className="font-semibold text-white text-sm mb-1">{int.label}</div>
-                <div className="text-xs text-violet-400 mb-2">{int.desc}</div>
-                <div className="text-xs text-slate-500 leading-relaxed">{int.note}</div>
+                <div className="text-xs text-brand-400 mb-2">{int.desc}</div>
+                <div className="text-xs text-ocean-500 leading-relaxed">{int.note}</div>
               </div>
             ))}
           </div>
 
           {/* Statement */}
-          <div className="bg-slate-900 border border-violet-500/30 rounded-2xl p-5">
+          <div className="bg-ocean-900 border border-brand-500/30 rounded-2xl p-5">
             <div className="flex items-center justify-between mb-3">
               <div>
                 <div className="font-semibold text-white">Tu declaración de propósito</div>
-                <div className="text-xs text-slate-500 mt-0.5">Generada por IA desde tu IKIGAI, o escríbela tú mismo</div>
+                <div className="text-xs text-ocean-500 mt-0.5">Generada por IA desde tu IKIGAI, o escríbela tú mismo</div>
               </div>
               <button
                 onClick={generateStatement}
                 disabled={statementLoading || totalItems < 4}
                 title={totalItems < 4 ? "Completa al menos 1 ítem por cuadrante primero" : ""}
-                className="bg-violet-600 hover:bg-violet-700 disabled:opacity-40 text-white px-4 py-2 rounded-xl text-xs font-medium transition-colors flex items-center gap-2"
+                className="bg-brand-600 hover:bg-brand-700 disabled:opacity-40 text-white px-4 py-2 rounded-xl text-xs font-medium transition-colors flex items-center gap-2"
               >
                 {statementLoading
                   ? <><span className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Generando...</>
@@ -682,13 +682,13 @@ Responde SOLO con la declaración, sin explicaciones ni comillas extra.`;
               onChange={e => setData(prev => ({ ...prev, ikigai_statement: e.target.value }))}
               rows={5}
               placeholder={`Escribe aquí tu declaración de propósito personal.\n\nEj: "Soy un constructor de sistemas que combina inteligencia financiera y tecnología para ayudar a personas a alcanzar libertad e impacto real."`}
-              className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white placeholder-slate-600 focus:outline-none focus:border-violet-500 resize-none text-sm leading-relaxed"
+              className="w-full bg-ocean-800 border border-ocean-700 rounded-xl px-4 py-3 text-white placeholder-ocean-600 focus:outline-none focus:border-brand-500 resize-none text-sm leading-relaxed"
             />
             {data.ikigai_statement && (
-              <div className="text-xs text-slate-600 mt-1">{data.ikigai_statement.length} caracteres</div>
+              <div className="text-xs text-ocean-600 mt-1">{data.ikigai_statement.length} caracteres</div>
             )}
 
-            <button onClick={() => save()} disabled={saving} className="mt-3 bg-violet-600 hover:bg-violet-700 disabled:opacity-50 text-white px-5 py-2 rounded-xl text-sm font-medium transition-colors">
+            <button onClick={() => save()} disabled={saving} className="mt-3 bg-brand-600 hover:bg-brand-700 disabled:opacity-50 text-white px-5 py-2 rounded-xl text-sm font-medium transition-colors">
               {saving ? "Guardando..." : saved ? "Guardado" : "Guardar declaración"}
             </button>
           </div>
@@ -700,11 +700,11 @@ Responde SOLO con la declaración, sin explicaciones ni comillas extra.`;
                 <div key={key} className={`border rounded-xl p-4 ${meta.border} ${meta.bg}`}>
                   <div className={`text-xs font-medium mb-2 ${meta.color}`}>{meta.label}</div>
                   {data[key].length === 0 ? (
-                    <div className="text-slate-600 text-xs italic">Sin ítems</div>
+                    <div className="text-ocean-600 text-xs italic">Sin ítems</div>
                   ) : (
                     <ul className="space-y-0.5">
                       {data[key].map((item, i) => (
-                        <li key={i} className="text-xs text-slate-300">• {item}</li>
+                        <li key={i} className="text-xs text-ocean-300">• {item}</li>
                       ))}
                     </ul>
                   )}

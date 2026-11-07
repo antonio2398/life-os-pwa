@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { X } from "lucide-react";
+import { toLocalMonth } from "@/lib/dates";
 
 // Cierre de mes: transfiere el balance (ingresos − egresos) del mes a uno o varios activos de Riqueza.
 // Cada mes se cierra una sola vez (unique user_id + month en month_closings).
@@ -32,7 +33,7 @@ export default function MonthCloseCard({ month, totalIncome, totalExpense }: { m
   const [error,        setError]        = useState<string | null>(null);
   const [confirmReopen, setConfirmReopen] = useState(false);
 
-  const currentMonth = new Date().toISOString().slice(0, 7);
+  const currentMonth = toLocalMonth();
   // Solo el mes actual y el anterior: los meses viejos ya están reflejados en los valores de los activos
   const closable = month <= currentMonth && month >= previousMonth(currentMonth);
 
@@ -131,14 +132,14 @@ export default function MonthCloseCard({ month, totalIncome, totalExpense }: { m
 
   // ── Mes ya cerrado ──────────────────────────────────────────────────────────
   if (closing) return (
-    <div className="bg-slate-900 border border-green-500/30 rounded-2xl p-4 space-y-2">
+    <div className="bg-ocean-900 border border-green-500/30 rounded-2xl p-4 space-y-2">
       <div className="flex items-center justify-between flex-wrap gap-2">
         <div className="text-sm text-white font-semibold">Mes cerrado · {new Date(closing.closed_at).toLocaleDateString("es-CO")}</div>
         {closable && !confirmReopen && (
-          <button onClick={() => setConfirmReopen(true)} className="text-xs text-slate-400 hover:text-white border border-slate-700 px-3 py-1.5 rounded-lg">Reabrir</button>
+          <button onClick={() => setConfirmReopen(true)} className="text-xs text-ocean-400 hover:text-white border border-ocean-700 px-3 py-1.5 rounded-lg">Reabrir</button>
         )}
       </div>
-      <div className="text-xs text-slate-400">
+      <div className="text-xs text-ocean-400">
         Balance {closing.balance >= 0 ? "+" : "-"}{money(closing.balance)}
         {(closing.allocations ?? []).length > 0 && <> → {closing.allocations.map(a => `${a.asset_name} (${a.amount >= 0 ? "+" : "-"}${money(a.amount)})`).join(", ")}</>}
       </div>
@@ -148,10 +149,10 @@ export default function MonthCloseCard({ month, totalIncome, totalExpense }: { m
         </div>
       )}
       {confirmReopen && (
-        <div className="flex items-center gap-2 flex-wrap bg-slate-800/60 rounded-xl p-3">
-          <span className="text-xs text-slate-300 flex-1">Se revertirán los montos en Riqueza y podrás volver a cerrar el mes.</span>
+        <div className="flex items-center gap-2 flex-wrap bg-ocean-800/60 rounded-xl p-3">
+          <span className="text-xs text-ocean-300 flex-1">Se revertirán los montos en Riqueza y podrás volver a cerrar el mes.</span>
           <button onClick={reopenMonth} disabled={busy} className="text-xs bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-lg disabled:opacity-50">{busy ? "Revirtiendo..." : "Sí, reabrir"}</button>
-          <button onClick={() => setConfirmReopen(false)} className="text-xs text-slate-400 border border-slate-700 px-3 py-1.5 rounded-lg">Cancelar</button>
+          <button onClick={() => setConfirmReopen(false)} className="text-xs text-ocean-400 border border-ocean-700 px-3 py-1.5 rounded-lg">Cancelar</button>
         </div>
       )}
       {error && <div className="text-xs text-red-400">{error}</div>}
@@ -160,11 +161,11 @@ export default function MonthCloseCard({ month, totalIncome, totalExpense }: { m
 
   // ── Mes abierto ─────────────────────────────────────────────────────────────
   return (
-    <div className="bg-slate-900 border border-violet-500/30 rounded-2xl p-4 space-y-3">
+    <div className="bg-ocean-900 border border-brand-500/30 rounded-2xl p-4 space-y-3">
       <div className="flex items-center justify-between flex-wrap gap-2">
         <div>
           <div className="text-sm text-white font-semibold">Cierre de mes</div>
-          <div className="text-xs text-slate-400 mt-0.5">
+          <div className="text-xs text-ocean-400 mt-0.5">
             {balance > 0 ? `Te sobraron ${money(balance)}: asígnalos a tus activos en Riqueza.`
               : balance < 0 ? `Gastaste ${money(balance)} más de lo que ingresó: indica de qué activo salió.`
               : "Balance en cero: no hay nada que transferir."}
@@ -172,14 +173,14 @@ export default function MonthCloseCard({ month, totalIncome, totalExpense }: { m
         </div>
         {closable && !showForm && (
           <button onClick={balance === 0 ? closeMonth : openForm} disabled={busy}
-            className="text-xs bg-violet-600 hover:bg-violet-700 text-white px-4 py-2 rounded-lg font-medium disabled:opacity-50">
+            className="text-xs bg-brand-600 hover:bg-brand-700 text-white px-4 py-2 rounded-lg font-medium disabled:opacity-50">
             Cerrar mes
           </button>
         )}
       </div>
 
       {!closable && (
-        <div className="text-xs text-slate-500">Solo se pueden cerrar el mes actual y el anterior. Los meses anteriores ya están reflejados en el valor de tus activos.</div>
+        <div className="text-xs text-ocean-500">Solo se pueden cerrar el mes actual y el anterior. Los meses anteriores ya están reflejados en el valor de tus activos.</div>
       )}
 
       {closable && showForm && (
@@ -190,32 +191,32 @@ export default function MonthCloseCard({ month, totalIncome, totalExpense }: { m
             {rows.map((row, i) => (
               <div key={i} className="flex gap-2 items-center">
                 <select value={row.asset_id} onChange={e => setRows(p => p.map((r, j) => j === i ? { ...r, asset_id: e.target.value } : r))}
-                  className="flex-1 min-w-0 bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-violet-500">
+                  className="flex-1 min-w-0 bg-ocean-800 border border-ocean-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-brand-500">
                   {assets.map(a => <option key={a.id} value={a.id}>{a.name} ({money(a.current_value)})</option>)}
                 </select>
                 <input type="number" min={0} step="0.01" value={row.amount}
                   onChange={e => setRows(p => p.map((r, j) => j === i ? { ...r, amount: e.target.value } : r))}
-                  className="w-28 bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-violet-500" />
+                  className="w-28 bg-ocean-800 border border-ocean-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-brand-500" />
                 {rows.length > 1 && (
-                  <button onClick={() => setRows(p => p.filter((_, j) => j !== i))} className="text-slate-500 hover:text-red-400 text-xs px-1"><X size={14} /></button>
+                  <button onClick={() => setRows(p => p.filter((_, j) => j !== i))} className="text-ocean-500 hover:text-red-400 text-xs px-1"><X size={14} /></button>
                 )}
               </div>
             ))}
             <div className="flex items-center justify-between flex-wrap gap-2">
               <button onClick={() => setRows(p => [...p, { asset_id: assets[0].id, amount: String(Math.max(remaining, 0)) }])}
-                className="text-xs text-violet-400 hover:text-violet-300">+ Repartir en otro activo</button>
+                className="text-xs text-brand-400 hover:text-brand-300">+ Repartir en otro activo</button>
               <span className={`text-xs ${Math.abs(remaining) > 0.009 ? "text-yellow-400" : "text-green-400"}`}>
                 {Math.abs(remaining) > 0.009 ? `Sin asignar: ${remaining < 0 ? "-" : ""}${money(remaining)}` : "Todo asignado"}
               </span>
             </div>
-            <div className="text-xs text-slate-500">
+            <div className="text-xs text-ocean-500">
               {balance >= 0 ? "Los montos se sumarán" : "Los montos se restarán"} al valor del activo en Riqueza.
             </div>
             <div className="flex gap-2">
-              <button onClick={closeMonth} disabled={busy} className="text-xs bg-violet-600 hover:bg-violet-700 text-white px-4 py-2 rounded-lg font-medium disabled:opacity-50">
+              <button onClick={closeMonth} disabled={busy} className="text-xs bg-brand-600 hover:bg-brand-700 text-white px-4 py-2 rounded-lg font-medium disabled:opacity-50">
                 {busy ? "Cerrando..." : "Confirmar cierre"}
               </button>
-              <button onClick={() => setShowForm(false)} className="text-xs text-slate-400 border border-slate-700 px-4 py-2 rounded-lg">Cancelar</button>
+              <button onClick={() => setShowForm(false)} className="text-xs text-ocean-400 border border-ocean-700 px-4 py-2 rounded-lg">Cancelar</button>
             </div>
           </div>
         )

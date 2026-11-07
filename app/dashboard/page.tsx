@@ -37,29 +37,29 @@ export default function DashboardPage() {
   const scoreColor = lifeScore >= 70 ? "text-green-400" : lifeScore >= 40 ? "text-yellow-400" : "text-red-400";
   return (
     <div className="space-y-8">
-      <div><h2 className="text-2xl font-bold text-white">Dashboard</h2><p className="text-slate-400 text-sm mt-1">Tu resumen ejecutivo semanal</p></div>
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 flex items-center gap-8">
-        <div className="text-center"><div className={`text-6xl font-black ${scoreColor}`}>{lifeScore}</div><div className="text-slate-400 text-sm mt-1">Life Score</div></div>
+      <div><h2 className="text-2xl font-bold text-white">Dashboard</h2><p className="text-ocean-400 text-sm mt-1">Tu resumen ejecutivo semanal</p></div>
+      <div className="bg-ocean-900 border border-ocean-800 rounded-2xl p-6 flex items-center gap-8">
+        <div className="text-center"><div className={`text-6xl font-black ${scoreColor}`}>{lifeScore}</div><div className="text-ocean-400 text-sm mt-1">Life Score</div></div>
         <div className="flex-1 grid grid-cols-2 gap-3">
           {LIFE_AREAS.map(area => {
             const score = diagnosticScores[area.id] || 0;
-            return (<div key={area.id} className="space-y-1"><div className="flex justify-between text-xs text-slate-400"><span>{area.name}</span><span className="text-white">{score}/100</span></div><div className="h-1.5 bg-slate-800 rounded-full overflow-hidden"><div className={`h-full rounded-full ${score >= 70 ? "bg-green-500" : score >= 40 ? "bg-yellow-500" : "bg-red-500"}`} style={{ width: `${score}%` }} /></div></div>);
+            return (<div key={area.id} className="space-y-1"><div className="flex justify-between text-xs text-ocean-400"><span>{area.name}</span><span className="text-white">{score}/100</span></div><div className="h-1.5 bg-ocean-800 rounded-full overflow-hidden"><div className={`h-full rounded-full ${score >= 70 ? "bg-green-500" : score >= 40 ? "bg-yellow-500" : "bg-red-500"}`} style={{ width: `${score}%` }} /></div></div>);
           })}
         </div>
       </div>
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+      <div className="bg-ocean-900 border border-ocean-800 rounded-2xl p-6">
         <h3 className="text-lg font-semibold text-white mb-4"> Scorecard Semanal</h3>
         <div className="space-y-3">
           {SCORECARD.map((item, i) => {
             const pct = Math.floor(Math.random() * 120);
             const color = pct >= 100 ? "bg-green-500" : pct >= 70 ? "bg-yellow-500" : "bg-red-500";
-            return (<div key={i} className="flex items-center gap-3"><div className="w-40 text-sm text-slate-300 truncate">{item.label}</div><div className="flex-1 h-2 bg-slate-800 rounded-full overflow-hidden"><div className={`h-full rounded-full ${color}`} style={{ width: `${Math.min(pct, 100)}%` }} /></div><div className="w-12 text-right text-xs text-slate-400">{pct}%</div></div>);
+            return (<div key={i} className="flex items-center gap-3"><div className="w-40 text-sm text-ocean-300 truncate">{item.label}</div><div className="flex-1 h-2 bg-ocean-800 rounded-full overflow-hidden"><div className={`h-full rounded-full ${color}`} style={{ width: `${Math.min(pct, 100)}%` }} /></div><div className="w-12 text-right text-xs text-ocean-400">{pct}%</div></div>);
           })}
         </div>
       </div>
       <div className="grid grid-cols-3 gap-4">
         {[{ href: "/habits", label: " Registrar Habitos", desc: "Check diario" },{ href: "/finances", label: " Registrar Gasto", desc: "Movimiento nuevo" },{ href: "/tasks", label: " Ver Tareas", desc: "Pendientes de hoy" }].map(item => (
-          <a key={item.href} href={item.href} className="bg-slate-900 border border-slate-800 rounded-xl p-4 hover:border-violet-600 transition-colors"><div className="font-medium text-white">{item.label}</div><div className="text-slate-400 text-sm mt-0.5">{item.desc}</div></a>
+          <a key={item.href} href={item.href} className="bg-ocean-900 border border-ocean-800 rounded-xl p-4 hover:border-brand-600 transition-colors"><div className="font-medium text-white">{item.label}</div><div className="text-ocean-400 text-sm mt-0.5">{item.desc}</div></a>
         ))}
       </div>
     </div>

@@ -1,8 +1,9 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Check, Pencil, X } from "lucide-react";
+import { toLocalDate } from "@/lib/dates";
 
 const LIFE_AREAS = [
   { id: 1, name: "Salud / Bienestar" },
@@ -17,6 +18,7 @@ const LIFE_AREAS = [
 const DAYS_SHORT = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
 
 const COLORS = [
+  { label: "Aqua",    value: "#2CC7D5" },
   { label: "Violeta", value: "#7c3aed" },
   { label: "Azul",    value: "#3b82f6" },
   { label: "Verde",   value: "#22c55e" },
@@ -35,12 +37,12 @@ function getWeekDates(): string[] {
   return Array.from({ length: 7 }, (_, i) => {
     const d = new Date(monday);
     d.setDate(monday.getDate() + i);
-    return d.toISOString().split("T")[0];
+    return toLocalDate(d);
   });
 }
 
 function getTodayString(): string {
-  return new Date().toISOString().split("T")[0];
+  return toLocalDate();
 }
 
 const FREQUENCY_LABELS: Record<string, { label: string; period: string; max: number; defaultTarget: number }> = {
@@ -72,7 +74,7 @@ const EMPTY_HABIT: Omit<Habit, "id"> = {
   description: "",
   frequency: "daily",
   target_per_week: 7,
-  color: "#7c3aed",
+  color: "#2CC7D5",
   is_active: true,
   current_streak: 0,
   best_streak: 0,
@@ -202,7 +204,7 @@ export default function HabitsPage() {
 
   if (loading) return (
     <div className="flex items-center justify-center h-64">
-      <div className="text-slate-400">Cargando hábitos...</div>
+      <div className="text-ocean-400">Cargando hábitos...</div>
     </div>
   );
 
@@ -212,11 +214,11 @@ export default function HabitsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-white">Hábitos</h2>
-          <p className="text-slate-400 text-sm mt-1">Registro semanal · Semana del {weekDates[0]} al {weekDates[6]}</p>
+          <p className="text-ocean-400 text-sm mt-1">Registro semanal · Semana del {weekDates[0]} al {weekDates[6]}</p>
         </div>
         <button
           onClick={() => { setShowForm(true); setEditingId(null); setHabitForm(EMPTY_HABIT); }}
-          className="bg-violet-600 hover:bg-violet-700 text-white px-5 py-2 rounded-lg font-medium transition-colors"
+          className="bg-brand-600 hover:bg-brand-700 text-white px-5 py-2 rounded-lg font-medium transition-colors"
         >
           + Nuevo Hábito
         </button>
@@ -225,21 +227,21 @@ export default function HabitsPage() {
       {/* KPIs */}
       <div className="grid grid-cols-4 gap-3">
         {[
-          { label: "Hábitos activos",    value: activeHabits.length, color: "text-violet-400" },
+          { label: "Hábitos activos",    value: activeHabits.length, color: "text-brand-400" },
           { label: "Completados hoy",    value: `${todayCompleted}/${activeHabits.length}`, color: "text-blue-400" },
           { label: "Promedio semanal",   value: `${weekAvg}%`, color: weekAvg >= 80 ? "text-green-400" : weekAvg >= 50 ? "text-yellow-400" : "text-red-400" },
           { label: "Mejor racha activa", value: activeHabits.length > 0 ? Math.max(...activeHabits.map(h => h.current_streak)) + "d" : "0d", color: "text-orange-400" },
         ].map(kpi => (
-          <div key={kpi.label} className="bg-slate-900 border border-slate-800 rounded-xl p-4 text-center">
+          <div key={kpi.label} className="bg-ocean-900 border border-ocean-800 rounded-xl p-4 text-center">
             <div className={`text-3xl font-black ${kpi.color}`}>{kpi.value}</div>
-            <div className="text-xs text-slate-500 mt-1">{kpi.label}</div>
+            <div className="text-xs text-ocean-500 mt-1">{kpi.label}</div>
           </div>
         ))}
       </div>
 
       {/* Today checklist */}
       {activeHabits.length > 0 && (
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
+        <div className="bg-ocean-900 border border-ocean-800 rounded-2xl p-5">
           <h3 className="text-sm font-semibold text-white mb-4">Check de hoy — {today}</h3>
           <div className="grid grid-cols-2 gap-2">
             {activeHabits.map(habit => {
@@ -250,11 +252,11 @@ export default function HabitsPage() {
                   key={habit.id}
                   onClick={() => toggleLog(habit.id, today)}
                   disabled={isToggling}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-xl border transition-all text-left ${done ? "border-transparent text-white" : "border-slate-700 text-slate-400 hover:border-slate-600"}`}
+                  className={`flex items-center gap-3 px-4 py-3 rounded-xl border transition-all text-left ${done ? "border-transparent text-white" : "border-ocean-700 text-ocean-400 hover:border-ocean-600"}`}
                   style={done ? { backgroundColor: habit.color + "25", borderColor: habit.color + "60" } : {}}
                 >
                   <div
-                    className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${done ? "border-transparent" : "border-slate-600"}`}
+                    className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${done ? "border-transparent" : "border-ocean-600"}`}
                     style={done ? { backgroundColor: habit.color } : {}}
                   >
                     {done && <Check size={12} className="text-white" />}
@@ -272,26 +274,26 @@ export default function HabitsPage() {
 
       {/* Habit Form */}
       {showForm && (
-        <div className="bg-slate-900 border border-violet-500/40 rounded-2xl p-5 space-y-4">
+        <div className="bg-ocean-900 border border-brand-500/40 rounded-2xl p-5 space-y-4">
           <div className="text-sm font-semibold text-white">{editingId ? "Editar hábito" : "Nuevo hábito"}</div>
           <input
             value={habitForm.title}
             onChange={e => setHabitForm(p => ({ ...p, title: e.target.value }))}
             placeholder="Nombre del hábito"
-            className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-violet-500"
+            className="w-full bg-ocean-800 border border-ocean-700 rounded-lg px-4 py-2.5 text-white placeholder-ocean-500 focus:outline-none focus:border-brand-500"
           />
           <textarea
             value={habitForm.description}
             onChange={e => setHabitForm(p => ({ ...p, description: e.target.value }))}
             placeholder="Descripción o regla del hábito (opcional)"
             rows={2}
-            className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-violet-500 resize-none text-sm"
+            className="w-full bg-ocean-800 border border-ocean-700 rounded-lg px-4 py-2.5 text-white placeholder-ocean-500 focus:outline-none focus:border-brand-500 resize-none text-sm"
           />
           <div className="grid grid-cols-3 gap-3">
             <select
               value={habitForm.life_area_id}
               onChange={e => setHabitForm(p => ({ ...p, life_area_id: Number(e.target.value) }))}
-              className="bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-violet-500 text-sm"
+              className="bg-ocean-800 border border-ocean-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-brand-500 text-sm"
             >
               {LIFE_AREAS.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
             </select>
@@ -302,29 +304,29 @@ export default function HabitsPage() {
                 frequency: e.target.value,
                 target_per_week: freqInfo(e.target.value).defaultTarget,
               }))}
-              className="bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-violet-500 text-sm"
+              className="bg-ocean-800 border border-ocean-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-brand-500 text-sm"
             >
               {Object.entries(FREQUENCY_LABELS).map(([value, f]) => <option key={value} value={value}>{f.label}</option>)}
             </select>
             <div className="flex items-center gap-2">
-              <label className="text-slate-400 text-xs shrink-0">Meta/{freqInfo(habitForm.frequency).period}:</label>
+              <label className="text-ocean-400 text-xs shrink-0">Meta/{freqInfo(habitForm.frequency).period}:</label>
               <input
                 type="number" min={1} max={freqInfo(habitForm.frequency).max}
                 value={habitForm.target_per_week}
                 onChange={e => setHabitForm(p => ({ ...p, target_per_week: Number(e.target.value) }))}
-                className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2.5 text-white focus:outline-none focus:border-violet-500 text-sm"
+                className="w-full bg-ocean-800 border border-ocean-700 rounded-lg px-3 py-2.5 text-white focus:outline-none focus:border-brand-500 text-sm"
               />
             </div>
           </div>
 
           <div>
-            <label className="text-xs text-slate-400 block mb-2">Color</label>
+            <label className="text-xs text-ocean-400 block mb-2">Color</label>
             <div className="flex gap-2 flex-wrap">
               {COLORS.map(c => (
                 <button
                   key={c.value}
                   onClick={() => setHabitForm(p => ({ ...p, color: c.value }))}
-                  className={`w-7 h-7 rounded-full transition-transform ${habitForm.color === c.value ? "scale-125 ring-2 ring-white ring-offset-2 ring-offset-slate-800" : "hover:scale-110"}`}
+                  className={`w-7 h-7 rounded-full transition-transform ${habitForm.color === c.value ? "scale-125 ring-2 ring-white ring-offset-2 ring-offset-ocean-800" : "hover:scale-110"}`}
                   style={{ backgroundColor: c.value }}
                   title={c.label}
                 />
@@ -333,10 +335,10 @@ export default function HabitsPage() {
           </div>
 
           <div className="flex gap-2">
-            <button onClick={saveHabit} disabled={saving} className="bg-violet-600 hover:bg-violet-700 text-white text-sm px-5 py-2 rounded-lg font-medium disabled:opacity-50">
+            <button onClick={saveHabit} disabled={saving} className="bg-brand-600 hover:bg-brand-700 text-white text-sm px-5 py-2 rounded-lg font-medium disabled:opacity-50">
               {saving ? "Guardando..." : "Guardar"}
             </button>
-            <button onClick={() => { setShowForm(false); setEditingId(null); }} className="text-slate-400 hover:text-white text-sm px-4 py-2 rounded-lg border border-slate-700">
+            <button onClick={() => { setShowForm(false); setEditingId(null); }} className="text-ocean-400 hover:text-white text-sm px-4 py-2 rounded-lg border border-ocean-700">
               Cancelar
             </button>
           </div>
@@ -345,42 +347,42 @@ export default function HabitsPage() {
 
       {/* View toggle */}
       <div className="flex items-center gap-3">
-        <div className="flex gap-1 bg-slate-900 border border-slate-800 rounded-lg p-1">
+        <div className="flex gap-1 bg-ocean-900 border border-ocean-800 rounded-lg p-1">
           {(["week", "list"] as const).map(v => (
             <button key={v} onClick={() => setActiveView(v)}
-              className={`px-3 py-1 text-xs rounded-md transition-colors ${activeView === v ? "bg-violet-600 text-white" : "text-slate-400 hover:text-white"}`}>
+              className={`px-3 py-1 text-xs rounded-md transition-colors ${activeView === v ? "bg-brand-600 text-white" : "text-ocean-400 hover:text-white"}`}>
               {v === "week" ? "Semana" : "Lista"}
             </button>
           ))}
         </div>
         <button onClick={() => setShowInactive(!showInactive)}
-          className={`text-xs px-3 py-1 rounded-lg border transition-colors ${showInactive ? "border-violet-500 text-violet-400" : "border-slate-700 text-slate-500 hover:text-slate-300"}`}>
+          className={`text-xs px-3 py-1 rounded-lg border transition-colors ${showInactive ? "border-brand-500 text-brand-400" : "border-ocean-700 text-ocean-500 hover:text-ocean-300"}`}>
           {showInactive ? "Ocultar inactivos" : "Mostrar inactivos"}
         </button>
-        <span className="text-xs text-slate-600 ml-auto">{visibleHabits.length} hábito{visibleHabits.length !== 1 ? "s" : ""}</span>
+        <span className="text-xs text-ocean-600 ml-auto">{visibleHabits.length} hábito{visibleHabits.length !== 1 ? "s" : ""}</span>
       </div>
 
       {/* WEEKLY TABLE */}
       {activeView === "week" && (
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden">
+        <div className="bg-ocean-900 border border-ocean-800 rounded-2xl overflow-hidden">
           {visibleHabits.length === 0 ? (
-            <div className="text-center py-12 text-slate-600">
-              <div className="text-slate-500">Sin hábitos. Agrega tu primer hábito.</div>
+            <div className="text-center py-12 text-ocean-600">
+              <div className="text-ocean-500">Sin hábitos. Agrega tu primer hábito.</div>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-slate-800">
-                    <th className="text-left px-4 py-3 text-slate-400 text-sm font-medium w-48">Hábito</th>
+                  <tr className="border-b border-ocean-800">
+                    <th className="text-left px-4 py-3 text-ocean-400 text-sm font-medium w-48">Hábito</th>
                     {weekDates.map((date, i) => (
-                      <th key={date} className={`px-2 py-3 text-center text-xs font-medium w-12 ${date === today ? "text-violet-400" : "text-slate-500"}`}>
+                      <th key={date} className={`px-2 py-3 text-center text-xs font-medium w-12 ${date === today ? "text-brand-400" : "text-ocean-500"}`}>
                         <div>{DAYS_SHORT[i]}</div>
                         <div className="font-normal opacity-70">{date.slice(8)}</div>
                       </th>
                     ))}
-                    <th className="px-4 py-3 text-center text-slate-400 text-xs font-medium">Racha</th>
-                    <th className="px-4 py-3 text-center text-slate-400 text-xs font-medium">Semana</th>
+                    <th className="px-4 py-3 text-center text-ocean-400 text-xs font-medium">Racha</th>
+                    <th className="px-4 py-3 text-center text-ocean-400 text-xs font-medium">Semana</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -388,13 +390,13 @@ export default function HabitsPage() {
                     const habitLogs = logs[habit.id] ?? [];
                     const weekPct = weekCompletion(habit);
                     return (
-                      <tr key={habit.id} className={`border-b border-slate-800 last:border-0 ${!habit.is_active ? "opacity-40" : ""}`}>
+                      <tr key={habit.id} className={`border-b border-ocean-800 last:border-0 ${!habit.is_active ? "opacity-40" : ""}`}>
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-2">
                             <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: habit.color }} />
                             <div>
                               <div className="text-sm text-white font-medium truncate max-w-[140px]">{habit.title}</div>
-                              <div className="text-xs text-slate-500">{LIFE_AREAS.find(a => a.id === habit.life_area_id)?.name}</div>
+                              <div className="text-xs text-ocean-500">{LIFE_AREAS.find(a => a.id === habit.life_area_id)?.name}</div>
                             </div>
                           </div>
                         </td>
@@ -409,8 +411,8 @@ export default function HabitsPage() {
                                 onClick={() => !isFuture && habit.is_active && toggleLog(habit.id, date)}
                                 disabled={isFuture || !habit.is_active || isToggling}
                                 className={`w-8 h-8 rounded-lg transition-all mx-auto flex items-center justify-center text-sm ${
-                                  isFuture ? "opacity-20 cursor-not-allowed bg-slate-800" :
-                                  !done ? `${isT ? "bg-slate-700" : "bg-slate-800"} hover:bg-slate-700 text-slate-600` :
+                                  isFuture ? "opacity-20 cursor-not-allowed bg-ocean-800" :
+                                  !done ? `${isT ? "bg-ocean-700" : "bg-ocean-800"} hover:bg-ocean-700 text-ocean-600` :
                                   "text-white shadow-md"
                                 }`}
                                 style={done ? { backgroundColor: habit.color } : {}}
@@ -425,11 +427,11 @@ export default function HabitsPage() {
                             {habit.current_streak > 0 && <span className="text-orange-400"></span>}
                             <span className="text-sm text-white font-medium">{habit.current_streak}d</span>
                           </div>
-                          <div className="text-xs text-slate-600">mejor: {habit.best_streak}d</div>
+                          <div className="text-xs text-ocean-600">mejor: {habit.best_streak}d</div>
                         </td>
                         <td className="px-4 py-3 text-center">
                           <div className={`text-sm font-bold ${weekPct >= 100 ? "text-green-400" : weekPct >= 70 ? "text-yellow-400" : "text-red-400"}`}>{weekPct}%</div>
-                          <div className="text-xs text-slate-600">{periodCount(habit)}/{habit.target_per_week}{habit.frequency === "monthly" ? " mes" : ""}</div>
+                          <div className="text-xs text-ocean-600">{periodCount(habit)}/{habit.target_per_week}{habit.frequency === "monthly" ? " mes" : ""}</div>
                         </td>
                       </tr>
                     );
@@ -445,47 +447,47 @@ export default function HabitsPage() {
       {activeView === "list" && (
         <div className="space-y-3">
           {visibleHabits.length === 0 ? (
-            <div className="text-center py-12 text-slate-600">
-              <div className="text-slate-500">Sin hábitos registrados</div>
+            <div className="text-center py-12 text-ocean-600">
+              <div className="text-ocean-500">Sin hábitos registrados</div>
             </div>
           ) : (
             visibleHabits.map(habit => {
               const weekPct = weekCompletion(habit);
               const area = LIFE_AREAS.find(a => a.id === habit.life_area_id);
               return (
-                <div key={habit.id} className={`bg-slate-900 border border-slate-800 rounded-2xl p-5 ${!habit.is_active ? "opacity-50" : ""}`}>
+                <div key={habit.id} className={`bg-ocean-900 border border-ocean-800 rounded-2xl p-5 ${!habit.is_active ? "opacity-50" : ""}`}>
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-start gap-3 flex-1">
                       <div className="w-3 h-3 rounded-full mt-1.5 shrink-0" style={{ backgroundColor: habit.color }} />
                       <div className="flex-1">
                         <div className="font-semibold text-white">{habit.title}</div>
-                        <div className="text-xs text-slate-500 mt-0.5">{area?.name} · {freqInfo(habit.frequency).label} · Meta: {habit.target_per_week}x/{freqInfo(habit.frequency).period}</div>
-                        {habit.description && <div className="text-sm text-slate-400 mt-1">{habit.description}</div>}
+                        <div className="text-xs text-ocean-500 mt-0.5">{area?.name} · {freqInfo(habit.frequency).label} · Meta: {habit.target_per_week}x/{freqInfo(habit.frequency).period}</div>
+                        {habit.description && <div className="text-sm text-ocean-400 mt-1">{habit.description}</div>}
                       </div>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
-                      <button onClick={() => toggleActive(habit)} className={`text-xs px-2 py-1 rounded border transition-colors ${habit.is_active ? "border-green-500/50 text-green-400" : "border-slate-700 text-slate-500"}`}>
+                      <button onClick={() => toggleActive(habit)} className={`text-xs px-2 py-1 rounded border transition-colors ${habit.is_active ? "border-green-500/50 text-green-400" : "border-ocean-700 text-ocean-500"}`}>
                         {habit.is_active ? "Activo" : "Inactivo"}
                       </button>
-                      <button onClick={() => openEditHabit(habit)} className="text-slate-500 hover:text-blue-400 text-xs transition-colors"><Pencil size={14} /></button>
-                      <button onClick={() => deleteHabit(habit.id)} className="text-slate-500 hover:text-red-400 text-xs transition-colors"><X size={14} /></button>
+                      <button onClick={() => openEditHabit(habit)} className="text-ocean-500 hover:text-blue-400 text-xs transition-colors"><Pencil size={14} /></button>
+                      <button onClick={() => deleteHabit(habit.id)} className="text-ocean-500 hover:text-red-400 text-xs transition-colors"><X size={14} /></button>
                     </div>
                   </div>
 
                   <div className="mt-4 grid grid-cols-3 gap-4">
                     <div className="text-center">
                       <div className={`text-xl font-black ${weekPct >= 100 ? "text-green-400" : weekPct >= 70 ? "text-yellow-400" : "text-red-400"}`}>{weekPct}%</div>
-                      <div className="text-xs text-slate-500">esta semana</div>
+                      <div className="text-xs text-ocean-500">esta semana</div>
                     </div>
                     <div className="text-center">
                       <div className="text-xl font-black text-orange-400 flex items-center justify-center gap-1">
                         {habit.current_streak > 0 && ""}{habit.current_streak}
                       </div>
-                      <div className="text-xs text-slate-500">racha actual</div>
+                      <div className="text-xs text-ocean-500">racha actual</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-xl font-black text-slate-300">{habit.best_streak}</div>
-                      <div className="text-xs text-slate-500">mejor racha</div>
+                      <div className="text-xl font-black text-ocean-300">{habit.best_streak}</div>
+                      <div className="text-xs text-ocean-500">mejor racha</div>
                     </div>
                   </div>
 
@@ -495,13 +497,13 @@ export default function HabitsPage() {
                       const isFuture = date > today;
                       return (
                         <div key={date} className="text-center">
-                          <div className="text-xs text-slate-600 mb-1">{DAYS_SHORT[i].charAt(0)}</div>
+                          <div className="text-xs text-ocean-600 mb-1">{DAYS_SHORT[i].charAt(0)}</div>
                           <button
                             onClick={() => !isFuture && habit.is_active && toggleLog(habit.id, date)}
                             disabled={isFuture || !habit.is_active}
                             className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs transition-all ${
-                              isFuture ? "opacity-20 cursor-not-allowed bg-slate-800" :
-                              done ? "text-white" : "bg-slate-800 hover:bg-slate-700 text-slate-600"
+                              isFuture ? "opacity-20 cursor-not-allowed bg-ocean-800" :
+                              done ? "text-white" : "bg-ocean-800 hover:bg-ocean-700 text-ocean-600"
                             }`}
                             style={done ? { backgroundColor: habit.color } : {}}
                           >

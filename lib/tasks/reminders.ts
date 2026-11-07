@@ -1,3 +1,4 @@
+import { toLocalDate } from "@/lib/dates";
 export const REMIND_BEFORE_MIN = 10;
 export const ALL_DAYS = [0, 1, 2, 3, 4, 5, 6];
 const DAY_MS = 86400000;
@@ -56,6 +57,4 @@ export function computeRemindAt(task: RemindableTask, now = new Date()): string 
   return at > now ? at.toISOString() : null;
 }
 
-export function toLocalDate(d: Date) {
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-}
+export { toLocalDate };

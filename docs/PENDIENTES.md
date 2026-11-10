@@ -98,8 +98,8 @@ Estado actual: **Next.js en Vercel + Supabase** (Postgres, Auth, pg_cron) + Gemi
 
 | Fecha | ID | Qué | Commit |
 |---|---|---|---|
-| 2026-11-10 | — | Las tareas diarias no aparecían en la cuadrícula del calendario (ni fines de semana ni ningún día; solo en el panel lateral). Ahora salen cada día de repetición. | *(pendiente de commit)* |
-| 2026-11-10 | — | Hábitos: días de repetición, calendario compartido con Tareas, detalle con descripción, editar/eliminar/activar desde la vista Semana, buscador con fecha de creación y conversión a tareas diarias. Tareas: detalle con descripción y filtro por fecha de creación. | *(pendiente de commit)* |
+| 2026-11-10 | — | Las tareas diarias no aparecían en la cuadrícula del calendario (ni fines de semana ni ningún día; solo en el panel lateral). Ahora salen cada día de repetición. | `8aba12e` |
+| 2026-11-10 | — | Hábitos: días de repetición, calendario compartido con Tareas, detalle con descripción, editar/eliminar/activar desde la vista Semana, buscador con fecha de creación y conversión a tareas diarias. Tareas: detalle con descripción y filtro por fecha de creación. | `8aba12e` |
 | 2026-11-06 | — | Fechas en UTC: hábitos y finanzas registraban el día siguiente después de las 6–7 pm (América). Nuevo `lib/dates.ts`. | `0d917be` |
 | 2026-11-06 | — | La PWA no tenía íconos (`public/icons/` vacío); ahora 192/512/maskable/apple-touch/favicon. | `0d917be` |
 | 2026-10-08 | — | Estrategias DOFA (FO/DO/FA/DA) no se podían guardar (enum). | `29b91b0` |

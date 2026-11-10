@@ -15,6 +15,7 @@ Prioridad: **P0** bloquea o rompe algo hoy · **P1** antes de abrir a más usuar
 | BUG-01 | P0 | **El conversor de divisas de Finanzas nunca funciona.** La UI llama `/api/currency?amount=…&from=…&to=…` y espera `{converted, rate}`, pero esa ruta es un stub de cron que exige `Authorization: Bearer CRON_SECRET` y responde 401. | `app/dashboard/finances/page.tsx:62` (fetch en `CurrencyConverter`) vs `app/api/currency/route.ts:3-4` | Implementar la conversión real (p. ej. API de tasas con caché diaria) y quitar la verificación de cron de esa ruta. |
 | BUG-02 | P1 | **Las rachas de hábitos siempre muestran 0.** `current_streak` y `best_streak` se leen pero ningún código los calcula. | `grep current_streak` solo aparece en lectura (`app/dashboard/habits/page.tsx`) | Calcular la racha a partir de `habit_logs` al marcar/desmarcar (o con una vista SQL). |
 | BUG-03 | P2 | Las tareas diarias completadas solo vuelven a "pendiente" cuando el usuario **abre la página de Tareas**; el dashboard o las notificaciones pueden verlas como completadas al día siguiente. | `app/dashboard/tasks/page.tsx:132` (reseteo en el cliente al cargar) | Resetear en el servidor (pg_cron diario o calcular el estado por fecha). |
+| BUG-05 | P2 | En el calendario, el estado de una **tarea diaria** solo se conoce para hoy (no hay historial por día): los días pasados se ven sin tachar aunque se hayan hecho. | `components/agenda/AgendaCalendar.tsx` (`taskDone`) y reseteo en `app/dashboard/tasks/page.tsx` | Tabla `task_logs` (como `habit_logs`) para guardar cada día completado. |
 | BUG-04 | P3 | Página de Configuración de IA sin tildes ("Configuracion"). | `app/dashboard/settings/ai/page.tsx:25` | Revisar textos de toda la app. |
 
 ## 2. Seguridad y privacidad
@@ -87,7 +88,8 @@ Estado actual: **Next.js en Vercel + Supabase** (Postgres, Auth, pg_cron) + Gemi
 | ID | Pendiente |
 |---|---|
 | DATA-01 | "Fondo de emergencia" quedó en $0 (fórmula `#REF!` en el Excel). Santiago debe poner el valor real en Riqueza. |
-| DATA-02 | Sus 6 hábitos originales siguen inactivos; activarlos si los usa. |
+| DATA-02 | Sus 6 hábitos originales siguen inactivos; activarlos si los usa (o convertirlos en tareas diarias desde Hábitos). |
+| DATA-04 | **Aplicar `sql/2026-11-10_habits_repeat_days.sql` en Supabase** antes de usar los días de repetición de hábitos. *Por verificar* que se aplicó. |
 | DATA-03 | IDs de lo importado: guardados fuera del repo (scratchpad de la sesión del 2026-10-07); los primeros 400 ingresos no tienen ID registrado. |
 
 ---
@@ -96,6 +98,8 @@ Estado actual: **Next.js en Vercel + Supabase** (Postgres, Auth, pg_cron) + Gemi
 
 | Fecha | ID | Qué | Commit |
 |---|---|---|---|
+| 2026-11-10 | — | Las tareas diarias no aparecían en la cuadrícula del calendario (ni fines de semana ni ningún día; solo en el panel lateral). Ahora salen cada día de repetición. | *(pendiente de commit)* |
+| 2026-11-10 | — | Hábitos: días de repetición, calendario compartido con Tareas, detalle con descripción, editar/eliminar/activar desde la vista Semana, buscador con fecha de creación y conversión a tareas diarias. Tareas: detalle con descripción y filtro por fecha de creación. | *(pendiente de commit)* |
 | 2026-11-06 | — | Fechas en UTC: hábitos y finanzas registraban el día siguiente después de las 6–7 pm (América). Nuevo `lib/dates.ts`. | `0d917be` |
 | 2026-11-06 | — | La PWA no tenía íconos (`public/icons/` vacío); ahora 192/512/maskable/apple-touch/favicon. | `0d917be` |
 | 2026-10-08 | — | Estrategias DOFA (FO/DO/FA/DA) no se podían guardar (enum). | `29b91b0` |

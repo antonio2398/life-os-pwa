@@ -1,8 +1,13 @@
 ﻿"use client";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { ALL_DAYS, computeRemindAt, repeatsOn, toLocalDate } from "@/lib/tasks/reminders";
+import { ALL_DAYS, computeRemindAt, toLocalDate } from "@/lib/tasks/reminders";
+import { createdInRange, describeRepeat, formatDate, formatDateTime } from "@/lib/agenda";
 import { enablePush, isPushEnabled } from "@/lib/push";
+import AgendaCalendar from "@/components/agenda/AgendaCalendar";
+import CreatedDateFilter from "@/components/agenda/CreatedDateFilter";
+import DetailModal from "@/components/agenda/DetailModal";
+import RepeatDaysPicker from "@/components/agenda/RepeatDaysPicker";
 import { Ban, Bell, BellOff, Calendar, Check, Clock, Folder, Pencil, RotateCcw, Search, X } from "lucide-react";
 
 const LIFE_AREAS = [
@@ -15,23 +20,13 @@ const LIFE_AREAS = [
   { id: 7, name: "Impacto" },
 ];
 
+const STATUS_LABEL: Record<string, string> = { pending: "Pendiente", in_progress: "En progreso", completed: "Completada", cancelled: "Cancelada" };
+
 const PRIORITY_CONFIG: Record<string, { label: string; badge: string; dot: string }> = {
   high:   { label: "Alta",  badge: "bg-red-500/20 text-red-400 border border-red-500/30",    dot: "bg-red-500" },
   medium: { label: "Media", badge: "bg-yellow-500/20 text-yellow-400 border border-yellow-500/30", dot: "bg-yellow-500" },
   low:    { label: "Baja",  badge: "bg-green-500/20 text-green-400 border border-green-500/30",  dot: "bg-green-500" },
 };
-
-const WEEKDAYS = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
-// Orden lunes→domingo con el índice de Date.getDay() (0 = domingo)
-const REPEAT_DAY_OPTIONS = [[1, "L"], [2, "M"], [3, "X"], [4, "J"], [5, "V"], [6, "S"], [0, "D"]] as const;
-
-function describeRepeat(days: number[]) {
-  if (days.length === 7) return "Todos los días";
-  const key = [...days].sort().join(",");
-  if (key === "1,2,3,4,5") return "Lunes a viernes";
-  if (key === "0,6") return "Fines de semana";
-  return REPEAT_DAY_OPTIONS.filter(([d]) => days.includes(d)).map(([d]) => WEEKDAYS[(d + 6) % 7]).join(", ");
-}
 
 interface Project {
   id: string;
@@ -58,7 +53,10 @@ interface Task {
   due_time: string;
   completed_at: string | null;
   cancelled_at: string | null;
+  created_at: string | null;
 }
+
+type TaskForm = Omit<Task, "id" | "created_at">;
 
 interface ConfirmDialog {
   title: string;
@@ -69,13 +67,10 @@ interface ConfirmDialog {
 }
 
 const EMPTY_PROJECT: Omit<Project, "id"> = { goal_id: null, life_area_id: 1, title: "", description: "", status: "planned", start_date: "", end_date: "" };
-const EMPTY_TASK: Omit<Task, "id"> = { project_id: null, life_area_id: 1, title: "", description: "", priority: "medium", status: "pending", task_type: "general", repeat_days: ALL_DAYS, due_date: "", due_time: "", completed_at: null, cancelled_at: null };
-
-const formatDateTime = (iso: string) =>
-  new Date(iso).toLocaleString("es", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
+const EMPTY_TASK: TaskForm = { project_id: null, life_area_id: 1, title: "", description: "", priority: "medium", status: "pending", task_type: "general", repeat_days: ALL_DAYS, due_date: "", due_time: "", completed_at: null, cancelled_at: null };
 
 /** Campos derivados al cambiar de estado (fechas de completada/cancelada y próximo aviso). */
-function statusFields(task: Omit<Task, "id">, status: string) {
+function statusFields(task: TaskForm, status: string) {
   const now = new Date().toISOString();
   return {
     status,
@@ -98,9 +93,9 @@ export default function TasksPage() {
   const [confirmDialog, setConfirmDialog] = useState<ConfirmDialog | null>(null);
   const [pushEnabled, setPushEnabled] = useState(false);
 
-  // Calendar
-  const [calMonth, setCalMonth] = useState(() => { const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), 1); });
-  const [selectedDay, setSelectedDay] = useState(() => toLocalDate(new Date()));
+  const [createdFrom, setCreatedFrom] = useState("");
+  const [createdTo, setCreatedTo] = useState("");
+  const [detailTask, setDetailTask] = useState<Task | null>(null);
 
   // Forms
   const [showProjectForm, setShowProjectForm] = useState(false);
@@ -109,7 +104,7 @@ export default function TasksPage() {
   const [savingProject, setSavingProject] = useState(false);
 
   const [showTaskForm, setShowTaskForm] = useState(false);
-  const [taskForm, setTaskForm] = useState<Omit<Task, "id">>(EMPTY_TASK);
+  const [taskForm, setTaskForm] = useState<TaskForm>(EMPTY_TASK);
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
   const [savingTask, setSavingTask] = useState(false);
 
@@ -206,7 +201,7 @@ export default function TasksPage() {
     load();
   }
 
-  function openNewTask(prefill: Partial<Omit<Task, "id">> = {}) {
+  function openNewTask(prefill: Partial<TaskForm> = {}) {
     setTaskForm({ ...EMPTY_TASK, ...prefill });
     setEditingTaskId(null);
     setShowTaskForm(true);
@@ -218,6 +213,13 @@ export default function TasksPage() {
     setEditingTaskId(task.id);
     setShowTaskForm(true);
     setActiveTab("tasks");
+  }
+
+  /** Desde el calendario compartido: lee la tarea fresca antes de editarla. */
+  async function editTaskById(id: string) {
+    const { data } = await supabase.from("tasks").select("*").eq("id", id).single();
+    if (!data) return;
+    openEditTask({ ...data, task_type: data.task_type ?? "general", repeat_days: data.repeat_days?.length ? data.repeat_days : ALL_DAYS, due_date: data.due_date ?? "", due_time: data.due_time?.slice(0, 5) ?? "", description: data.description ?? "" });
   }
 
   async function deleteTask(id: string) {
@@ -267,6 +269,7 @@ export default function TasksPage() {
     if (filterStatus !== "active" && filterStatus !== "all" && t.status !== filterStatus) return false;
     if (filterPriority !== "all" && t.priority !== filterPriority) return false;
     if (filterArea !== "all" && String(t.life_area_id) !== filterArea) return false;
+    if (!createdInRange(t.created_at, createdFrom, createdTo)) return false;
     if (query) {
       const project = projects.find(p => p.id === t.project_id);
       const haystack = `${t.title} ${t.description ?? ""} ${project?.title ?? ""}`.toLowerCase();
@@ -287,17 +290,6 @@ export default function TasksPage() {
   const countable = tasks.length - cancelledCount;
 
   const getDaysLeft = (date: string) => Math.ceil((new Date(`${date}T00:00`).getTime() - new Date(`${toLocalDate(new Date())}T00:00`).getTime()) / 86400000);
-
-  // Calendar data
-  const dailyTasksOn = (day: string) => tasks.filter(t => t.task_type === "daily" && t.status !== "cancelled" && repeatsOn(t, new Date(`${day}T00:00`))).sort((a, b) => (a.due_time || "99").localeCompare(b.due_time || "99"));
-  const tasksOn = (day: string) => tasks.filter(t => t.task_type === "general" && t.due_date === day && t.status !== "cancelled").sort((a, b) => (a.due_time || "99").localeCompare(b.due_time || "99"));
-  const calendarDays = (() => {
-    const first = new Date(calMonth);
-    const offset = (first.getDay() + 6) % 7; // lunes = 0
-    const start = new Date(first.getFullYear(), first.getMonth(), 1 - offset);
-    return Array.from({ length: 42 }, (_, i) => new Date(start.getFullYear(), start.getMonth(), start.getDate() + i));
-  })();
-  const todayStr = toLocalDate(new Date());
 
   if (loading) return <div className="flex items-center justify-center h-64"><div className="text-ocean-400">Cargando...</div></div>;
 
@@ -326,8 +318,10 @@ export default function TasksPage() {
 
         {/* Content */}
         <div className="flex-1 min-w-0">
-          <div className={`font-medium ${isCompleted || isCancelled ? "line-through text-ocean-500" : "text-white"}`}>{task.title}</div>
-          {task.description && <div className="text-xs text-ocean-500 mt-0.5 truncate">{task.description}</div>}
+          <button onClick={() => setDetailTask(task)} title="Ver detalle y descripción" className="block text-left w-full">
+            <div className={`font-medium hover:underline decoration-ocean-600 ${isCompleted || isCancelled ? "line-through text-ocean-500" : "text-white"}`}>{task.title}</div>
+            {task.description && <div className="text-xs text-ocean-500 mt-0.5 truncate">{task.description}</div>}
+          </button>
           <div className="flex items-center gap-2 mt-1.5 flex-wrap">
             <span className={`text-xs px-1.5 py-0.5 rounded-full ${task.task_type === "daily" ? "bg-sky-500/20 text-sky-400 border border-sky-500/30" : "bg-ocean-700/40 text-ocean-400 border border-ocean-600/40"}`}>
               {task.task_type === "daily" ? "Diaria" : "General"}
@@ -341,6 +335,7 @@ export default function TasksPage() {
               </span>
             )}
             {task.task_type === "daily" && <span className="text-xs text-ocean-500 inline-flex items-center gap-1"><Clock size={12} />{describeRepeat(task.repeat_days)}{task.due_time && ` ${task.due_time}`}</span>}
+            {task.created_at && <span className="text-xs text-ocean-600">Creada {formatDate(task.created_at)}</span>}
           </div>
           {isCompleted && task.completed_at && <div className="text-xs text-green-400/80 mt-1.5">Completada el {formatDateTime(task.completed_at)}</div>}
           {isCancelled && task.cancelled_at && <div className="text-xs text-red-400/80 mt-1.5">Cancelada el {formatDateTime(task.cancelled_at)}</div>}
@@ -374,6 +369,30 @@ export default function TasksPage() {
 
   return (
     <div className="space-y-6">
+      {/* Detalle de tarea (descripción completa) */}
+      {detailTask && (
+        <DetailModal
+          onClose={() => setDetailTask(null)}
+          info={{
+            title: detailTask.title,
+            kind: detailTask.task_type === "daily" ? "Tarea diaria" : "Tarea general",
+            description: detailTask.description,
+            done: detailTask.status === "completed",
+            meta: [
+              ["Estado", STATUS_LABEL[detailTask.status] ?? detailTask.status],
+              ["Prioridad", PRIORITY_CONFIG[detailTask.priority]?.label ?? detailTask.priority],
+              ["Área", LIFE_AREAS.find(a => a.id === detailTask.life_area_id)?.name ?? "—"],
+              ["Proyecto", projects.find(p => p.id === detailTask.project_id)?.title ?? "Sin proyecto"],
+              detailTask.task_type === "daily"
+                ? ["Se repite", `${describeRepeat(detailTask.repeat_days)}${detailTask.due_time ? ` · ${detailTask.due_time}` : ""}`]
+                : ["Fecha", detailTask.due_date ? `${detailTask.due_date}${detailTask.due_time ? ` ${detailTask.due_time}` : ""}` : "Sin fecha"],
+              ["Creada", detailTask.created_at ? formatDateTime(detailTask.created_at) : "—"],
+            ],
+          }}
+          actions={<button onClick={() => { const t = detailTask; setDetailTask(null); openEditTask(t); }} className="text-sm px-4 py-2 rounded-lg bg-brand-600 hover:bg-brand-700 text-white font-medium">Editar</button>}
+        />
+      )}
+
       {/* Confirm dialog */}
       {confirmDialog && (
         <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4" onClick={() => setConfirmDialog(null)}>
@@ -411,7 +430,7 @@ export default function TasksPage() {
           <button
             onClick={() => {
               if (activeTab === "projects") { setShowProjectForm(true); setEditingProjectId(null); setProjectForm(EMPTY_PROJECT); }
-              else openNewTask(activeTab === "calendar" ? { due_date: selectedDay } : {});
+              else openNewTask();
             }}
             className="bg-brand-600 hover:bg-brand-700 text-white px-5 py-2 rounded-lg font-medium transition-colors"
           >
@@ -484,28 +503,7 @@ export default function TasksPage() {
             <input type="time" value={taskForm.due_time} onChange={e => setTaskForm(p => ({ ...p, due_time: e.target.value }))} className="bg-ocean-800 border border-ocean-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-brand-500 text-sm" />
           </div>
           {taskForm.task_type === "daily" && (
-            <div className="space-y-2">
-              <div className="text-xs text-ocean-400">Repetir los días:</div>
-              <div className="flex items-center gap-1.5 flex-wrap">
-                {REPEAT_DAY_OPTIONS.map(([day, lbl]) => {
-                  const on = taskForm.repeat_days.includes(day);
-                  return (
-                    <button
-                      key={day}
-                      title={WEEKDAYS[(day + 6) % 7]}
-                      onClick={() => setTaskForm(p => ({ ...p, repeat_days: on ? p.repeat_days.filter(d => d !== day) : [...p.repeat_days, day] }))}
-                      className={`w-9 h-9 rounded-full text-sm font-medium border transition-colors ${on ? "bg-brand-600 border-brand-600 text-white" : "border-ocean-700 text-ocean-400 hover:border-brand-500"}`}
-                    >
-                      {lbl}
-                    </button>
-                  );
-                })}
-                <span className="mx-1 text-ocean-700">|</span>
-                {([["Todos", ALL_DAYS], ["L-V", [1, 2, 3, 4, 5]], ["Fin de semana", [0, 6]]] as const).map(([lbl, days]) => (
-                  <button key={lbl} onClick={() => setTaskForm(p => ({ ...p, repeat_days: [...days] }))} className="text-xs text-ocean-400 hover:text-white border border-ocean-700 rounded-lg px-2 py-1">{lbl}</button>
-                ))}
-              </div>
-            </div>
+            <RepeatDaysPicker value={taskForm.repeat_days} onChange={days => setTaskForm(p => ({ ...p, repeat_days: days }))} />
           )}
           {taskForm.due_time && (taskForm.task_type === "daily" || taskForm.due_date) && (
             <div className="text-xs text-ocean-500">Recibirás un aviso 10 minutos antes{!pushEnabled && " (activa los avisos arriba)"}.</div>
@@ -558,6 +556,7 @@ export default function TasksPage() {
               <option value="all">Área: Todas</option>
               {LIFE_AREAS.map(a => <option key={a.id} value={String(a.id)}>{a.name}</option>)}
             </select>
+            <CreatedDateFilter from={createdFrom} to={createdTo} onChange={(f, t) => { setCreatedFrom(f); setCreatedTo(t); }} />
             <span className="text-xs text-ocean-500 ml-auto">{filteredTasks.length} tarea{filteredTasks.length !== 1 ? "s" : ""}</span>
           </div>
 
@@ -572,86 +571,9 @@ export default function TasksPage() {
         </div>
       )}
 
-      {/* ── CALENDAR ─────────────────────────────────────── */}
+      {/* ── CALENDAR (compartido con Hábitos) ───────────── */}
       {activeTab === "calendar" && (
-        <div className="grid gap-4 lg:grid-cols-[1fr_320px]">
-          <div className="bg-ocean-900 border border-ocean-800 rounded-2xl p-4">
-            <div className="flex items-center justify-between mb-4">
-              <button onClick={() => setCalMonth(m => new Date(m.getFullYear(), m.getMonth() - 1, 1))} className="text-ocean-400 hover:text-white px-3 py-1 rounded-lg border border-ocean-700">‹</button>
-              <div className="text-white font-semibold capitalize">{calMonth.toLocaleDateString("es", { month: "long", year: "numeric" })}</div>
-              <button onClick={() => setCalMonth(m => new Date(m.getFullYear(), m.getMonth() + 1, 1))} className="text-ocean-400 hover:text-white px-3 py-1 rounded-lg border border-ocean-700">›</button>
-            </div>
-            <div className="grid grid-cols-7 gap-1 text-center text-xs text-ocean-500 mb-1">
-              {WEEKDAYS.map(d => <div key={d}>{d}</div>)}
-            </div>
-            <div className="grid grid-cols-7 gap-1">
-              {calendarDays.map(day => {
-                const key = toLocalDate(day);
-                const dayTasks = tasksOn(key);
-                const inMonth = day.getMonth() === calMonth.getMonth();
-                const isSelected = key === selectedDay;
-                const hasOverdue = key < todayStr && dayTasks.some(t => t.status !== "completed");
-                return (
-                  <button
-                    key={key}
-                    onClick={() => setSelectedDay(key)}
-                    className={`min-h-[64px] sm:min-h-[84px] rounded-lg border p-1 text-left align-top transition-colors ${isSelected ? "border-brand-500 bg-brand-500/10" : "border-ocean-800 hover:border-ocean-600"} ${inMonth ? "" : "opacity-40"}`}
-                  >
-                    <div className={`text-xs font-medium mb-1 ${key === todayStr ? "bg-brand-600 text-white rounded-full w-5 h-5 flex items-center justify-center" : "text-ocean-400"}`}>{day.getDate()}</div>
-                    <div className="space-y-0.5 hidden sm:block">
-                      {dayTasks.slice(0, 2).map(t => (
-                        <div key={t.id} className={`text-[10px] truncate rounded px-1 ${t.status === "completed" ? "text-ocean-500 line-through" : "text-ocean-200 bg-ocean-800"}`}>
-                          {t.due_time && `${t.due_time} `}{t.title}
-                        </div>
-                      ))}
-                      {dayTasks.length > 2 && <div className="text-[10px] text-ocean-500">+{dayTasks.length - 2} más</div>}
-                    </div>
-                    {dayTasks.length > 0 && (
-                      <div className="flex gap-0.5 sm:hidden">
-                        {dayTasks.slice(0, 3).map(t => <span key={t.id} className={`w-1.5 h-1.5 rounded-full ${PRIORITY_CONFIG[t.priority].dot}`} />)}
-                      </div>
-                    )}
-                    {hasOverdue && <div className="text-[10px] text-red-400 hidden sm:block">vencida</div>}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Selected day */}
-          <div className="bg-ocean-900 border border-ocean-800 rounded-2xl p-4 space-y-4 h-fit">
-            <div className="flex items-center justify-between">
-              <div className="text-white font-semibold capitalize">
-                {new Date(`${selectedDay}T00:00`).toLocaleDateString("es", { weekday: "long", day: "numeric", month: "long" })}
-              </div>
-              <button onClick={() => openNewTask({ due_date: selectedDay })} className="text-xs text-brand-400 hover:text-brand-300">+ Tarea</button>
-            </div>
-            <div className="space-y-2">
-              <div className="text-xs uppercase tracking-wide text-ocean-500">Generales</div>
-              {tasksOn(selectedDay).length === 0 ? (
-                <div className="text-sm text-ocean-600">Sin tareas este día</div>
-              ) : tasksOn(selectedDay).map(t => (
-                <button key={t.id} onClick={() => openEditTask(t)} className="w-full flex items-center gap-2 text-left text-sm bg-ocean-800/60 hover:bg-ocean-800 rounded-lg px-3 py-2">
-                  <span className={`w-2 h-2 rounded-full shrink-0 ${PRIORITY_CONFIG[t.priority].dot}`} />
-                  <span className="text-xs text-ocean-500 w-10 shrink-0">{t.due_time || "—"}</span>
-                  <span className={`flex-1 truncate ${t.status === "completed" ? "line-through text-ocean-500" : "text-ocean-200"}`}>{t.title}</span>
-                </button>
-              ))}
-            </div>
-            <div className="space-y-2">
-              <div className="text-xs uppercase tracking-wide text-ocean-500">Diarias</div>
-              {dailyTasksOn(selectedDay).length === 0 ? (
-                <div className="text-sm text-ocean-600">Ninguna se repite este día</div>
-              ) : dailyTasksOn(selectedDay).map(t => (
-                <button key={t.id} onClick={() => openEditTask(t)} className="w-full flex items-center gap-2 text-left text-sm bg-ocean-800/60 hover:bg-ocean-800 rounded-lg px-3 py-2">
-                  <span className={`w-2 h-2 rounded-full shrink-0 ${PRIORITY_CONFIG[t.priority].dot}`} />
-                  <span className="text-xs text-ocean-500 w-10 shrink-0">{t.due_time || "—"}</span>
-                  <span className={`flex-1 truncate ${selectedDay === todayStr && t.status === "completed" ? "line-through text-ocean-500" : "text-ocean-200"}`}>{t.title}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
+        <AgendaCalendar focus="tasks" onEditTask={editTaskById} onNewTask={day => openNewTask({ due_date: day })} />
       )}
 
       {/* ── PROJECTS ─────────────────────────────────────── */}

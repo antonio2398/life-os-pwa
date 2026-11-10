@@ -53,13 +53,27 @@ completada.
 - **Tareas generales:** tienen fecha de vencimiento y hora opcional.
 - **Tareas diarias:** se repiten los días que elijas; al completarlas vuelven a pendiente al día siguiente.
 - **Recordatorio:** si la tarea tiene hora y aceptaste notificaciones, recibes un aviso 10 minutos antes.
-- Búsqueda, vista de canceladas (con restaurar) y **calendario** mensual.
+- Búsqueda por título, descripción o proyecto y **por fecha de creación** (campos *Creada: desde – a*).
+- Vista de canceladas (con restaurar).
+- Toca el título de una tarea para ver su **descripción completa** y sus datos (incluida la fecha de creación).
+- **Calendario** mensual compartido con Hábitos: muestra las tareas generales en su fecha, las **tareas diarias en
+  cada día que se repiten** (incluidos sábados y domingos si los elegiste) y los hábitos activos. Toca un día y luego
+  un elemento para ver su descripción.
 
 ### Hábitos
 
 - Frecuencia **diaria, semanal o mensual** con una meta de veces por periodo.
-- Marca cada día en la tabla semanal o en *Check de hoy*. Los mensuales se miden contra el mes en curso.
-- Puedes desactivar un hábito sin perder su historial.
+- **Días del hábito:** elige qué días de la semana se muestra (L–D, "L-V" o "Fin de semana"), igual que las tareas
+  diarias. Solo esos días aparecen en el calendario, en *Check de hoy* y se pueden marcar en la tabla (los demás
+  muestran "—"). En hábitos diarios la meta semanal se ajusta sola al número de días.
+- Marca cada día en la tabla semanal, en *Check de hoy* o en el **Calendario**. Los mensuales se miden contra el mes.
+- Vistas: **Semana**, **Calendario** (compartido con Tareas: también ves tus tareas del día) y **Lista**.
+- Cada hábito tiene botones para **activar/desactivar**, **convertir en tarea diaria**, **editar** y **eliminar**
+  (en Semana y en Lista). Toca su nombre para ver la **descripción**.
+- Buscador por nombre o descripción, filtro **Activos / Inactivos / Todos** y filtro por **fecha de creación**.
+- **¿Creaste tareas como hábitos?** Usa *Convertir en tarea diaria* (uno) o *Convertir todos en tareas diarias*
+  (aviso azul arriba). Se crean en Tareas → Diarias con los mismos días, área y descripción, y se quitan de Hábitos
+  (se pierde su historial de marcas). Los hábitos inactivos pasan como tareas *canceladas* (puedes recuperarlas).
 
 ### Finanzas
 

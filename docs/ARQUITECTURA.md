@@ -27,7 +27,7 @@
 | `/dashboard/dofa` | DOFA + estrategias FO/DO/FA/DA (+ IA) | `swot_items`, `ai_recommendations` |
 | `/dashboard/goals` | Sueños → Metas | `dreams`, `goals` |
 | `/dashboard/tasks` | Proyectos, tareas generales y diarias, calendario, recordatorios push | `projects`, `tasks`, `push_subscriptions` |
-| `/dashboard/habits` | Hábitos diarios/semanales/mensuales y registro | `habits`, `habit_logs` |
+| `/dashboard/habits` | Hábitos diarios/semanales/mensuales con días de repetición, registro, calendario compartido, conversión a tareas diarias | `habits`, `habit_logs`, `tasks` |
 | `/dashboard/finances` | Ingresos, egresos, presupuesto, historial, **cierre de mes** | `incomes`, `expenses`, `budgets`, `weekly_scorecards`, `month_closings` |
 | `/dashboard/wealth` | Activos, pasivos, patrimonio neto, plan de deuda | `assets`, `liabilities` |
 | `/dashboard/settings/ai` | API key de Gemini del usuario | `users.gemini_api_key` |
@@ -42,6 +42,15 @@
   `month_closings` (único por usuario+mes; reabrir revierte). Solo mes actual y anterior.
 - **Fechas:** siempre en hora local del dispositivo con `lib/dates.ts` (`toLocalDate`, `toLocalMonth`). No usar
   `toISOString()` para "hoy"/"este mes".
+- **Calendario compartido (Tareas ↔ Hábitos):** `components/agenda/AgendaCalendar.tsx` se usa en las dos pantallas
+  y carga sus propios datos (tareas no canceladas, hábitos activos y `habit_logs` de las 6 semanas visibles). Un día
+  muestra: tareas generales con `due_date` ese día, tareas diarias y hábitos cuyo `repeat_days` incluye ese día de la
+  semana y que ya existían (`created_at` ≤ día). Desde ahí se marcan hábitos (hoy o días pasados) y se abre la ficha
+  de detalle (`components/agenda/DetailModal.tsx`). Utilidades comunes en `lib/agenda.ts` (días de repetición,
+  cuadrícula del mes, filtro por fecha de creación). Selector de días: `components/agenda/RepeatDaysPicker.tsx`.
+- **Hábito → tarea diaria:** `convertToDailyTasks` en `app/dashboard/habits/page.tsx` inserta en `tasks`
+  (`task_type = 'daily'`, mismos `repeat_days`, área y descripción; inactivos como `cancelled`) y luego borra los
+  `habit_logs` y los `habits`. Si el insert falla, no borra nada.
 - **Recordatorios:** al guardar una tarea se calcula `remind_at` (10 min antes, `lib/tasks/reminders.ts`); pg_cron
   llama `/api/push/cron` (protegido con `CRON_SECRET`), que envía el push y reprograma las diarias.
 
@@ -60,6 +69,8 @@
 
 - Migraciones aplicadas a mano en el SQL Editor de Supabase, guardadas en `sql/AAAA-MM-DD_descripcion.sql`.
 - El esquema completo **no** está en el repo todavía (PENDIENTES → INFRA-04).
+- `habits.repeat_days smallint[]` (0 = domingo … 6 = sábado, por defecto todos): `sql/2026-11-10_habits_repeat_days.sql`.
+  Si falta la columna, la app trata el hábito como "todos los días" y al guardar avisa que falta la migración.
 
 ## Identidad visual
 

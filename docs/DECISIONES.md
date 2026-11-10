@@ -2,6 +2,21 @@
 
 Decisiones de diseño y su porqué, para no reabrirlas sin razón. La más reciente arriba.
 
+### 2026-11-10 — Un solo calendario para Tareas y Hábitos
+
+Santiago pidió que los dos calendarios estuvieran conectados. En vez de dos calendarios sincronizados, hay **un
+componente** (`AgendaCalendar`) que ambas pantallas muestran y que lee tareas y hábitos directamente de Supabase:
+así nunca se desincronizan. Cambia solo el orden del panel del día (hábitos primero en Hábitos, tareas primero en
+Tareas). Los hábitos usan los mismos `repeat_days` que las tareas diarias (columna nueva) para que "qué días se
+muestra" funcione igual en los dos lados.
+
+### 2026-11-10 — Convertir hábitos en tareas diarias desde la app (no por SQL)
+
+Santiago registró tareas diarias como hábitos. En lugar de migrarlas con un script sobre su cuenta, se añadió la
+acción *Convertir en tarea diaria* (individual y "todos"): él decide cuáles son tareas y no se tocan datos de otros
+usuarios. Se pierde el historial de marcas del hábito porque las tareas diarias no guardan historial por día; los
+inactivos pasan como tareas canceladas (recuperables) para no activarlos sin querer.
+
 ### 2026-11-06 — Fechas siempre en hora local
 
 `toISOString()` convierte a UTC: en América, después de las 6–7 pm "hoy" pasaba a ser mañana (hábitos marcados en el
